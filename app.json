@@ -1,0 +1,73 @@
+{
+  "name": "ROHU Marketing Web",
+  "description": "Marketing and sales website for ROHU Contable (SaaS).",
+  "repository": "https://github.com/your-org/rohu-marketing-web",
+  "keywords": ["next", "nextjs", "marketing", "saas", "rohu", "colombia"],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "env": {
+    "NEXT_PUBLIC_SITE_URL": {
+      "description": "Canonical public URL of the deployed app",
+      "value": "https://rohu-marketing-web.herokuapp.com"
+    },
+    "NEXT_PUBLIC_DEMO_URL": {
+      "description": "URL of the hosted ROHU Contable demo",
+      "value": "https://rohu-contable-prod-3fba93dd2eb4.herokuapp.com/"
+    },
+    "NEXT_PUBLIC_DEMO_USER": {
+      "description": "Public demo username (fake data)",
+      "value": "rohu-contable"
+    },
+    "NEXT_PUBLIC_DEMO_PASSWORD": {
+      "description": "Public demo password (fake data)",
+      "value": "rohu-contable"
+    },
+    "NEXT_PUBLIC_WHATSAPP_PHONE": {
+      "description": "Owner WhatsApp phone in E.164 without the leading +",
+      "value": "57300XXXXXXX"
+    },
+    "NEXT_PUBLIC_WHATSAPP_DEFAULT_MESSAGE": {
+      "description": "Pre-filled WhatsApp message",
+      "value": "Hola, me interesa ROHU Contable y quiero más información."
+    },
+    "NEXT_PUBLIC_TELEGRAM_USERNAME": {
+      "description": "Optional public Telegram username (without @)",
+      "required": false
+    },
+    "TELEGRAM_BOT_TOKEN": {
+      "description": "Server-only token of the Telegram bot used for lead notifications",
+      "required": false
+    },
+    "TELEGRAM_CHAT_ID": {
+      "description": "Server-only chat ID where lead notifications are sent",
+      "required": false
+    },
+    "LEAD_API_URL": {
+      "description": "Optional CRM webhook that also receives each lead",
+      "required": false
+    },
+    "NPM_CONFIG_PRODUCTION": {
+      "description": "Force installing devDependencies for the Next.js build",
+      "value": "false"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "eco"
+    }
+  },
+  "environments": {
+    "review": {
+      "formation": {
+        "web": {
+          "quantity": 1,
+          "size": "eco"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-brand-bg text-brand-text font-body antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display text-brand-text;
+  }
+
+  h1 {
+    @apply text-4xl sm:text-5xl md:text-display-xl font-extrabold tracking-tight;
+  }
+
+  h2 {
+    @apply text-3xl sm:text-4xl md:text-display-lg font-bold tracking-tight;
+  }
+
+  h3 {
+    @apply text-xl sm:text-2xl md:text-display-md font-bold;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-accent ring-offset-2 ring-offset-brand-bg;
+  }
+
+  ::selection {
+    @apply bg-primary/15 text-primary-dark;
+  }
+}
+
+@layer components {
+  .btn-base {
+    @apply inline-flex items-center justify-center gap-2 rounded-brand-lg font-semibold
+           transition-all duration-200 ease-out
+           disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-primary {
+    @apply btn-base bg-primary text-white shadow-signature
+           hover:bg-primary-dark hover:shadow-elevated
+           active:scale-[0.98];
+  }
+
+  .btn-cta {
+    @apply btn-base bg-gradient-cta text-white shadow-signature
+           hover:shadow-elevated hover:scale-[1.01]
+           active:scale-[0.98];
+  }
+
+  .btn-secondary {
+    @apply btn-base bg-white text-primary border border-brand-border
+           hover:border-primary hover:bg-primary/5;
+  }
+
+  .btn-ghost {
+    @apply btn-base text-primary hover:bg-primary/5;
+  }
+
+  .card {
+    @apply rounded-brand-xl bg-white border border-brand-border shadow-card
+           transition-all duration-200;
+  }
+
+  .card-hoverable {
+    @apply card hover:shadow-elevated hover:-translate-y-0.5;
+  }
+
+  .section {
+    @apply py-16 sm:py-22 md:py-24;
+  }
+
+  .container-brand {
+    @apply mx-auto w-full max-w-6xl px-5 sm:px-6 lg:px-8;
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-2 rounded-full
+           bg-primary/5 text-primary text-xs font-semibold uppercase tracking-wider
+           px-3 py-1;
+  }
+
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4
+           focus:z-50 focus:rounded-brand-md focus:bg-primary focus:px-4 focus:py-2
+           focus:text-white focus:shadow-elevated;
+  }
+}
