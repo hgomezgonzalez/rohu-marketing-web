@@ -16,13 +16,14 @@ export const siteConfig = {
   legalName: 'ROHU Soluciones',
   brand: 'ROHU',
   description:
-    'ROHU Solutions desarrolla aplicaciones SaaS para el comercio y las pymes colombianas. Soluciones tecnológicas apalancadas en conocimientos contables y operacionales.',
-  tagline: 'Soluciones tecnológicas para el comercio colombiano',
+    'ROHU Solutions desarrolla aplicaciones SaaS verticales para que las pymes colombianas gestionen su negocio con tecnología propia, asequible y especializada.',
+  tagline: 'Aplicaciones SaaS verticales para pymes colombianas',
   locale: 'es-CO',
   keywords: [
     'ROHU Solutions',
     'software colombia',
     'SaaS colombia',
+    'apps verticales pymes',
     'ROHU Contable',
     'soluciones tecnológicas pymes',
     'software contable',
@@ -46,11 +47,11 @@ export const companyContent = {
 
   hero: {
     eyebrow: 'ROHU Solutions · Colombia',
-    h1: 'Soluciones tecnológicas para el comercio y las pymes colombianas',
+    h1: 'Aplicaciones SaaS que conectan tu operación con las exigencias del comercio colombiano',
     subheadline:
-      'Desarrollamos aplicaciones SaaS pensadas para tu sector, con rigor contable y acompañamiento real. Elige la que te calza o pídenos asesoría.',
-    cta_primary_label: 'Ver nuestras aplicaciones',
-    cta_secondary_label: 'Hablar con un asesor',
+      'Software vertical hecho en Colombia para que las pymes gestionen su negocio con tecnología propia, asequible y especializada por sector.',
+    cta_primary_label: 'Explora nuestras apps',
+    cta_secondary_label: 'Habla con un asesor',
   },
 
   applicationsSection: {
@@ -68,27 +69,27 @@ export const companyContent = {
 
   about: {
     eyebrow: 'Sobre ROHU Solutions',
-    section_title: 'Tecnología que entiende tu negocio y las normas del país',
+    section_title: 'Apps verticales hechas en Colombia para cada tipo de negocio',
     paragraph:
-      'ROHU Solutions es una empresa colombiana que desarrolla aplicaciones SaaS para el comercio y las pymes. Combinamos tecnología moderna con conocimiento contable y operacional para que cumplir con las políticas colombianas sea simple y tranquilo. Cada herramienta que lanzamos nace de una necesidad real del mercado que ya vimos repetirse muchas veces.',
+      'ROHU Solutions es una empresa colombiana que desarrolla aplicaciones SaaS especializadas por sector. En lugar de un ERP genérico con módulos desactivados, cada app se piensa desde cero para una vertical: contabilidad, restaurantes, salud, educación, inmobiliario. Combinamos tecnología moderna con conocimiento contable y operacional del mercado local para que crecer sea simple.',
     values: [
       {
         id: 'rigor',
-        title: 'Rigor contable',
-        description: 'Nuestras apps se alinean al Plan Único de Cuentas y a los estándares NIIF vigentes.',
+        title: 'Verticalización real',
+        description: 'Cada app está diseñada desde cero para un sector, no es un ERP genérico con módulos desactivados.',
       },
       {
         id: 'tech',
-        title: 'Tecnología sólida',
-        description: 'Stacks modernos, datos respaldados y actualizaciones continuas sin interrumpir tu operación.',
+        title: 'Precio y soporte colombiano',
+        description: 'Precios en COP, facturación electrónica DIAN incluida y un equipo que entiende la operación local.',
       },
       {
         id: 'support',
-        title: 'Acompañamiento real',
-        description: 'No desaparecemos después de la venta: te apoyamos en la implementación, capacitación y soporte.',
+        title: 'Ecosistema escalable',
+        description: 'Adopta una app y suma otras del catálogo sin cambiar de proveedor ni perder tus datos.',
       },
     ],
-    closing: 'Queremos ser el equipo tecnológico de confianza para cientos de negocios colombianos.',
+    closing: 'Queremos ser el equipo tecnológico de confianza de cientos de pymes colombianas.',
   },
 
   process: {

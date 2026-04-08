@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, Clock, Sparkles, Zap } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Clock, FlaskConical } from 'lucide-react';
 import { DynamicIcon } from '@/components/ui/DynamicIcon';
 import { Badge } from '@/components/ui/Badge';
 import type { Application } from '@/lib/applications';
@@ -24,7 +24,7 @@ export function ApplicationCard({ app }: Props) {
       : companyContent.applicationsSection.badge_coming_soon;
 
   const badgeTone = isLive ? 'success' : isBeta ? 'warning' : 'muted';
-  const BadgeIcon = isLive ? Zap : isBeta ? Sparkles : Clock;
+  const BadgeIcon = isLive ? CheckCircle2 : isBeta ? FlaskConical : Clock;
 
   const ctaLabel = isLive
     ? companyContent.applicationsSection.cta_live
@@ -49,13 +49,23 @@ export function ApplicationCard({ app }: Props) {
   const cardBody = (
     <article
       className={cn(
-        'group relative flex h-full flex-col rounded-brand-xl border bg-white p-6 sm:p-7 transition-all',
+        'group relative flex h-full flex-col rounded-brand-xl bg-white p-6 sm:p-7 transition-all',
         isLive
-          ? 'border-brand-border shadow-card hover:-translate-y-1 hover:border-primary/40 hover:shadow-elevated'
-          : 'border-brand-border/70 shadow-card opacity-85 hover:opacity-100'
+          ? 'border-2 border-secondary/40 shadow-card hover:-translate-y-1 hover:border-secondary hover:shadow-elevated'
+          : isBeta
+            ? 'border-2 border-warning/40 shadow-card hover:-translate-y-0.5 hover:border-warning hover:shadow-elevated'
+            : 'border border-brand-border/70 shadow-card opacity-80 hover:opacity-100'
       )}
     >
-      <div className="flex items-start justify-between gap-3 mb-5">
+      {/* Badge always at full opacity, even when coming_soon dims the rest */}
+      <div className="absolute top-4 right-4 z-10 opacity-100">
+        <Badge tone={badgeTone} className="gap-1.5">
+          <BadgeIcon size={11} strokeWidth={2.5} />
+          {badgeLabel}
+        </Badge>
+      </div>
+
+      <div className="mb-5">
         <span
           className={cn(
             'inline-flex h-14 w-14 items-center justify-center rounded-brand-lg bg-gradient-to-br text-white shadow-signature',
@@ -64,10 +74,6 @@ export function ApplicationCard({ app }: Props) {
         >
           <DynamicIcon name={app.iconName} size={26} strokeWidth={1.75} />
         </span>
-        <Badge tone={badgeTone} className="gap-1.5">
-          <BadgeIcon size={11} strokeWidth={2.5} />
-          {badgeLabel}
-        </Badge>
       </div>
 
       <h3 className="text-xl font-extrabold text-brand-text">{app.name}</h3>
