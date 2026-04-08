@@ -11,10 +11,12 @@ export type Lead = {
   city: string;
   email: string;
   whatsapp: string;
-  businessType: string;
-  numUsers: string;
+  businessType?: string;
+  numUsers?: string;
   message?: string;
   planInterest?: string;
+  /** Application of interest (slug from the registry) or 'general' */
+  application: string;
   habeasData: true;
   source: 'rohu-marketing-web';
 };

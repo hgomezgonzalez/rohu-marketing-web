@@ -26,14 +26,14 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${siteConfig.name} — Software contable para el comercio colombiano`,
+    default: `${siteConfig.name} — ${siteConfig.tagline}`,
     template: `%s · ${siteConfig.name}`,
   },
   description: siteConfig.description,
   keywords: [...siteConfig.keywords],
-  authors: [{ name: 'ROHU Soluciones' }],
-  creator: 'ROHU Soluciones',
-  publisher: 'ROHU Soluciones',
+  authors: [{ name: siteConfig.legalName }],
+  creator: siteConfig.legalName,
+  publisher: siteConfig.legalName,
   icons: {
     icon: '/rohu_favicon.ico',
     shortcut: '/rohu_favicon.ico',
@@ -44,14 +44,14 @@ export const metadata: Metadata = {
     locale: 'es_CO',
     url: SITE_URL,
     siteName: siteConfig.name,
-    title: `${siteConfig.name} — Software contable para el comercio colombiano`,
+    title: `${siteConfig.name} — ${siteConfig.tagline}`,
     description: siteConfig.description,
     images: [
       {
         url: '/rohu_logo.png',
         width: 1024,
         height: 1024,
-        alt: 'ROHU Contable',
+        alt: siteConfig.name,
       },
     ],
   },
@@ -76,7 +76,8 @@ export const viewport: Viewport = {
 const organizationJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  name: 'ROHU Soluciones',
+  name: siteConfig.legalName,
+  alternateName: siteConfig.name,
   url: SITE_URL,
   logo: `${SITE_URL}/rohu_logo.png`,
   description: siteConfig.description,
@@ -86,21 +87,6 @@ const organizationJsonLd = {
   },
 };
 
-const softwareJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'SoftwareApplication',
-  name: siteConfig.name,
-  applicationCategory: 'BusinessApplication',
-  operatingSystem: 'Web, Windows, Android',
-  offers: {
-    '@type': 'AggregateOffer',
-    priceCurrency: 'COP',
-    lowPrice: '0',
-    availability: 'https://schema.org/InStock',
-  },
-  description: siteConfig.description,
-};
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es-CO" className={`${inter.variable} ${manrope.variable}`}>
@@ -108,10 +94,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }}
         />
       </head>
       <body className="bg-brand-bg text-brand-text min-h-screen flex flex-col">

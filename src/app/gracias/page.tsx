@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { CheckCircle2, MessageCircle, ArrowLeft } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
-import { content } from '@/lib/content';
+import { commonContent } from '@/lib/content';
 import { buildWhatsAppUrl, getWhatsAppConfig } from '@/lib/contactChannels';
 
 export const metadata: Metadata = {
@@ -23,13 +23,13 @@ export default function ThankYouPage() {
             <CheckCircle2 size={40} strokeWidth={2} />
           </div>
 
-          <h1 className="text-brand-text">{content.thank_you.h1}</h1>
-          <p className="mt-4 text-lg text-brand-muted">{content.thank_you.subtitle}</p>
+          <h1 className="text-brand-text">{commonContent.thank_you.h1}</h1>
+          <p className="mt-4 text-lg text-brand-muted">{commonContent.thank_you.subtitle}</p>
 
-          <p className="mt-8 text-base text-brand-text leading-relaxed">{content.thank_you.body}</p>
+          <p className="mt-8 text-base text-brand-text leading-relaxed">{commonContent.thank_you.body}</p>
 
           <ul className="mt-10 text-left space-y-4 max-w-xl mx-auto">
-            {content.thank_you.next_steps.map((step, idx) => (
+            {commonContent.thank_you.next_steps.map((step, idx) => (
               <li
                 key={idx}
                 className="flex items-start gap-3 rounded-brand-lg border border-brand-border bg-white p-4 shadow-card"
@@ -45,7 +45,7 @@ export default function ThankYouPage() {
           <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/" className="btn-secondary px-6 py-3">
               <ArrowLeft size={18} strokeWidth={2} />
-              {content.thank_you.cta_home}
+              {commonContent.thank_you.cta_home}
             </Link>
             {waHref && (
               <a
@@ -55,12 +55,12 @@ export default function ThankYouPage() {
                 className="btn-cta px-6 py-3"
               >
                 <MessageCircle size={18} strokeWidth={2} />
-                {content.thank_you.cta_whatsapp}
+                {commonContent.thank_you.cta_whatsapp}
               </a>
             )}
           </div>
 
-          <p className="mt-8 text-xs text-brand-muted">{content.thank_you.micro_note}</p>
+          <p className="mt-8 text-xs text-brand-muted">{commonContent.thank_you.micro_note}</p>
         </div>
       </Container>
     </section>

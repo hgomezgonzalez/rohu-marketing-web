@@ -4,23 +4,27 @@ import { Check, Sparkles } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { Badge } from '@/components/ui/Badge';
-import { pricingSection, pricingTiers, type PricingTier } from '@/lib/pricingTiers';
+import type { PricingTier } from '@/types/pricingTier';
 import { trackEvent, EVENTS } from '@/lib/analytics';
 import { cn } from '@/lib/cn';
 
-export function PricingSection() {
+type Props = {
+  eyebrow: string;
+  title: string;
+  subtitle?: string;
+  tiers: readonly PricingTier[];
+  applicationId?: string;
+};
+
+export function PricingSection({ eyebrow, title, subtitle, tiers, applicationId }: Props) {
   return (
     <section id="pricing" className="section bg-white">
       <Container>
-        <SectionHeading
-          eyebrow={pricingSection.eyebrow}
-          title={pricingSection.section_title}
-          subtitle={pricingSection.section_subtitle}
-        />
+        <SectionHeading eyebrow={eyebrow} title={title} subtitle={subtitle} />
 
         <ul className="mt-12 grid gap-6 md:grid-cols-3 items-stretch">
-          {pricingTiers.map((tier) => (
-            <PricingCard key={tier.id} tier={tier} />
+          {tiers.map((tier) => (
+            <PricingCard key={tier.id} tier={tier} applicationId={applicationId} />
           ))}
         </ul>
 
@@ -32,7 +36,7 @@ export function PricingSection() {
   );
 }
 
-function PricingCard({ tier }: { tier: PricingTier }) {
+function PricingCard({ tier, applicationId }: { tier: PricingTier; applicationId?: string }) {
   return (
     <li
       className={cn(
@@ -61,11 +65,7 @@ function PricingCard({ tier }: { tier: PricingTier }) {
       <ul className="mt-6 space-y-3 flex-1">
         {tier.features.map((feature) => (
           <li key={feature} className="flex items-start gap-3 text-sm text-brand-text">
-            <Check
-              size={16}
-              strokeWidth={2.5}
-              className="mt-0.5 flex-shrink-0 text-secondary"
-            />
+            <Check size={16} strokeWidth={2.5} className="mt-0.5 flex-shrink-0 text-secondary" />
             <span>{feature}</span>
           </li>
         ))}
@@ -77,6 +77,7 @@ function PricingCard({ tier }: { tier: PricingTier }) {
           trackEvent(EVENTS.CLICK_PRICING, {
             plan_id: tier.id,
             plan_name: tier.name,
+            application_id: applicationId ?? null,
           })
         }
         className={cn(

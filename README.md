@@ -1,40 +1,75 @@
-# ROHU Marketing Web
+# ROHU Solutions Marketing Web
 
-Sitio web de marketing y ventas para **ROHU Contable** (SaaS contable colombiano).
-Producto-demo: https://rohu-contable-prod-3fba93dd2eb4.herokuapp.com/
+Sitio web corporativo y de ventas para **ROHU Solutions**, empresa colombiana que desarrolla aplicaciones SaaS para el comercio y las pymes. **ROHU Contable** es la primera aplicación del catálogo; más se agregarán con el tiempo y el sitio está preparado para escalar sin refactors.
+
+Producto-demo de ROHU Contable: https://rohu-contable-prod-3fba93dd2eb4.herokuapp.com/
 
 > **Idioma UI:** Español (Colombia) · **Código:** Inglés
-> **Stack:** Next.js 14 (App Router) · TypeScript · Tailwind CSS · react-hook-form · zod
+> **Stack:** Next.js 14 (App Router) · TypeScript · Tailwind CSS · react-hook-form · zod · nodemailer
 
 ---
 
 ## Tabla de contenidos
 
-1. [Arquitectura](#arquitectura)
-2. [Estructura del proyecto](#estructura-del-proyecto)
-3. [Setup local](#setup-local)
-4. [Variables de entorno](#variables-de-entorno)
-5. [Configuración del bot de Telegram](#configuración-del-bot-de-telegram)
-6. [Despliegue GitHub → Heroku](#despliegue-github--heroku)
-7. [Checklist final](#checklist-final)
-8. [Coordinación de agentes (resumen)](#coordinación-de-agentes-resumen)
+1. [Arquitectura multi-aplicación](#arquitectura-multi-aplicación)
+2. [Cómo agregar una nueva aplicación al catálogo](#cómo-agregar-una-nueva-aplicación-al-catálogo)
+3. [Estructura del proyecto](#estructura-del-proyecto)
+4. [Setup local](#setup-local)
+5. [Variables de entorno](#variables-de-entorno)
+6. [Configurar notificaciones por correo (Gmail SMTP)](#configurar-notificaciones-por-correo-gmail-smtp)
+7. [Configuración del bot de Telegram](#configuración-del-bot-de-telegram)
+8. [Despliegue GitHub → Heroku](#despliegue-github--heroku)
+9. [Checklist final](#checklist-final)
+10. [Resumen de orquestación de agentes](#resumen-de-orquestación-de-agentes)
 
 ---
 
-## Arquitectura
+## Arquitectura multi-aplicación
 
-- **Landing one-pager** + páginas legales (`/privacidad`, `/terminos`) + thank-you (`/gracias`).
-- **Formulario de leads** con `react-hook-form` + `zod`. POST a `/api/leads`:
-  1. Persiste en `data/leads.json` (dev/demo).
-  2. Notifica al dueño vía **Telegram Bot** (push instantáneo al celular).
-  3. Reenvía (opcional) a un webhook CRM si `LEAD_API_URL` está definido.
-- **Canal de contacto en vivo:**
-  - **WhatsApp click-to-chat** visible al visitante (FAB flotante, Hero, Footer).
-  - **Telegram Bot** como canal de notificación al dueño (siempre en línea).
-- **Tracking** con `window.dataLayer` propio (eventos listados en `src/lib/analytics.ts`). Queda preparado para conectar GA4/PostHog sin tocar call sites.
-- **SEO técnico:** metadata, Open Graph, Twitter card, `sitemap.ts`, `robots.ts`, JSON-LD (`Organization` + `SoftwareApplication`).
-- **Performance:** Next.js Image, fuentes con `display: swap`, Tailwind con purge, sin librerías pesadas.
-- **Seguridad:** headers básicos en `next.config.mjs`, rate limit in-memory en `/api/leads`, honeypot anti-bot, credenciales demo marcadas como públicas.
+El sitio está estructurado como un **hub corporativo**:
+
+- **`/`** — landing corporativa de ROHU Solutions: hero empresarial + grid dinámico de aplicaciones + about + proceso + testimonios + FAQs corporativas + formulario de contacto con selector "Aplicación de interés".
+- **`/productos/[slug]`** — landing dedicada por aplicación, generada automáticamente desde el registry. Hoy existe `/productos/rohu-contable`. Las aplicaciones `coming_soon` aparecen en el grid de la home pero no tienen página propia.
+- **`/privacidad` y `/terminos`** — páginas legales compartidas por toda la empresa.
+- **`/gracias`** — thank-you post-lead, corporativo.
+
+**Registry central:** `src/lib/applications.ts` es la fuente única de verdad. Contiene un array tipado `Application[]` con TODO el contenido de cada app (hero, beneficios, módulos, pricing, FAQs, demo, metadata, testimonials). El home grid, las páginas dinámicas, el sitemap y el selector del formulario leen de ahí.
+
+**Backend del formulario:**
+- POST a `/api/leads`:
+  1. Valida con zod (mismo schema del cliente).
+  2. Persiste en `data/leads.json` (dev/demo) con campo `application`.
+  3. **Envía email** al dueño vía SMTP (Gmail recomendado).
+  4. **Notifica en Telegram** al dueño (push instantáneo en el móvil).
+  5. Reenvía (opcional) a un webhook CRM si `LEAD_API_URL` está definido.
+- Rate limit in-memory (5 envíos/minuto por IP) + honeypot anti-bot.
+
+**Canal de contacto en vivo:**
+- **WhatsApp click-to-chat** visible al visitante (FAB flotante, Hero y Footer).
+- **Telegram Bot** opcional como canal paralelo de notificación instantánea al dueño.
+
+**Tracking:** `window.dataLayer` propio con eventos:
+- `view_company_home`, `view_application_page`, `click_application_card`
+- `click_demo`, `copy_demo_credentials`, `click_pricing`
+- `submit_lead`, `submit_lead_success`, `submit_lead_error`
+- `click_whatsapp_fab`, `click_whatsapp_hero`, `click_telegram`, `click_faq`
+
+Todos los eventos que aplican llevan `application_id` para poder segmentar por producto.
+
+**SEO técnico:** metadata global de ROHU Solutions, JSON-LD `Organization` en el layout, `SoftwareApplication` por cada `/productos/[slug]`, sitemap dinámico que incluye todas las apps `live`, Open Graph y Twitter cards.
+
+---
+
+## Cómo agregar una nueva aplicación al catálogo
+
+Proceso en **4 pasos** cuando estés listo para publicar `ROHU Restaurantes` (o cualquier otra):
+
+1. **Abre `src/lib/applications.ts`**. Ahí verás el array `applications` con `rohu-contable` como entrada `live` y varias apps `coming_soon`.
+2. **Convierte la entrada `coming_soon` en `live`** cambiando `status: 'live'` y llenando todos los campos que ahora están vacíos (`hero`, `benefits`, `modules`, `pricing`, `faqs`, `socialProof`, `ctaFinal`, `metaTitle`, `metaDescription`, `demo` si aplica).
+3. **Verifica** corriendo `npm run build`. Next.js generará automáticamente una página estática en `/productos/<tu-slug>`. Si falta algún campo, TypeScript te avisará.
+4. **Commit + push** a `main`. Heroku despliega y la app aparece inmediatamente en el grid de la home corporativa y en el selector del formulario.
+
+Si quieres agregar una app desde cero (no estaba en el registry), copia cualquier entrada existente, cambia `id`, `slug`, `name` y llena el contenido. El sistema no necesita ningún cambio de código adicional.
 
 ---
 
@@ -42,43 +77,47 @@ Producto-demo: https://rohu-contable-prod-3fba93dd2eb4.herokuapp.com/
 
 ```
 rohu-marketing-web/
-├── public/
-│   ├── rohu_logo.png
-│   └── rohu_favicon.ico
-├── data/                         # leads.json generated at runtime (gitignored)
+├── public/                       # logo, favicon
+├── data/                         # leads.json (gitignored, dev-only)
 ├── src/
 │   ├── app/
-│   │   ├── layout.tsx            # fonts, metadata, JSON-LD, header, footer, FAB
-│   │   ├── page.tsx              # landing
-│   │   ├── gracias/page.tsx
+│   │   ├── layout.tsx            # fonts, metadata ROHU Solutions, Org JSON-LD, Header, Footer, FAB
+│   │   ├── page.tsx              # landing corporativa
+│   │   ├── gracias/page.tsx      # thank-you post-lead
 │   │   ├── privacidad/page.tsx
 │   │   ├── terminos/page.tsx
-│   │   ├── api/leads/route.ts    # POST handler
+│   │   ├── productos/
+│   │   │   └── [slug]/
+│   │   │       ├── page.tsx      # landing dinámica por aplicación
+│   │   │       └── not-found.tsx
+│   │   ├── api/leads/route.ts    # POST → leadsStore + sendLeadEmail + notifyTelegram
 │   │   ├── sitemap.ts
 │   │   └── robots.ts
 │   ├── components/
 │   │   ├── layout/               # Header, Footer
-│   │   ├── sections/             # Hero, Benefits, Audience, HowItWorks, Modules, Pricing, SocialProof, Faq, Cta, DemoAccessBlock
-│   │   ├── ui/                   # Button, Card, Badge, Container, SectionHeading, CopyToClipboardButton, Accordion, BrandLogo, DynamicIcon, WhatsAppFab
-│   │   ├── forms/                # LeadForm + leadFormSchema (zod)
-│   │   └── LandingViewTracker.tsx
+│   │   ├── sections/             # Sections: Company (corporativas) + Application (por app)
+│   │   ├── ui/                   # Button, Card, Badge, BrandLogo, WhatsAppFab, etc.
+│   │   ├── forms/                # LeadForm + schema
+│   │   ├── CompanyViewTracker.tsx
+│   │   └── ApplicationViewTracker.tsx
 │   ├── lib/
-│   │   ├── content.ts            # ES copy — single source of truth
-│   │   ├── modules.ts
-│   │   ├── pricingTiers.ts
-│   │   ├── faqs.ts
-│   │   ├── analytics.ts          # dataLayer push + event constants
-│   │   ├── contactChannels.ts    # WhatsApp/Telegram URL builders
-│   │   ├── notifyTelegram.ts     # server-only push to owner's Telegram
+│   │   ├── applications.ts       # Registry multi-app (fuente única de verdad)
+│   │   ├── content.ts            # siteConfig, companyContent, commonContent
+│   │   ├── analytics.ts          # trackEvent + EVENTS
+│   │   ├── contactChannels.ts    # wa.me / t.me builders
+│   │   ├── notifyTelegram.ts     # push al bot del dueño
+│   │   ├── sendLeadEmail.ts      # email server-only con nodemailer
 │   │   ├── leadsStore.ts         # JSON-file persistence (dev/demo)
 │   │   └── cn.ts
 │   ├── styles/globals.css
-│   └── types/lead.ts
-├── .env.example
-├── Procfile
-├── app.json
-├── next.config.mjs
-├── tailwind.config.ts
+│   └── types/
+│       ├── lead.ts
+│       └── pricingTier.ts
+├── .env.example                  # plantilla de variables
+├── Procfile                      # Heroku: web: npm start
+├── app.json                      # Heroku review apps + config vars
+├── next.config.mjs               # security headers
+├── tailwind.config.ts            # brand tokens
 └── tsconfig.json
 ```
 
@@ -89,7 +128,7 @@ rohu-marketing-web/
 ```bash
 cd rohu-marketing-web
 cp .env.example .env.local
-# edit .env.local with your values (WhatsApp phone, Telegram bot, etc.)
+# edita .env.local con tus valores (WhatsApp, Telegram bot, SMTP App Password, etc.)
 npm install
 npm run dev
 ```
@@ -116,71 +155,106 @@ Ver `.env.example`. Las más críticas:
 |---|---|---|---|
 | `NEXT_PUBLIC_SITE_URL` | Público | Sí | URL canónica para sitemap/OG |
 | `NEXT_PUBLIC_DEMO_URL` | Público | Sí | URL del demo de ROHU Contable |
-| `NEXT_PUBLIC_DEMO_USER` | Público | Sí | Usuario demo (público por diseño) |
-| `NEXT_PUBLIC_DEMO_PASSWORD` | Público | Sí | Clave demo (pública por diseño) |
+| `NEXT_PUBLIC_DEMO_USER` | Público | Sí | `demo@rohu-contable.com` |
+| `NEXT_PUBLIC_DEMO_PASSWORD` | Público | Sí | `demo1234` |
 | `NEXT_PUBLIC_WHATSAPP_PHONE` | Público | Sí | Teléfono en E.164 sin `+` |
 | `NEXT_PUBLIC_WHATSAPP_DEFAULT_MESSAGE` | Público | Sí | Mensaje pre-llenado |
 | `NEXT_PUBLIC_TELEGRAM_USERNAME` | Público | No | Username sin `@` |
-| `TELEGRAM_BOT_TOKEN` | **Servidor** | Recomendada | Token del bot (secret) |
-| `TELEGRAM_CHAT_ID` | **Servidor** | Recomendada | Chat ID del dueño (secret) |
+| `TELEGRAM_BOT_TOKEN` | **Servidor** | Opcional | Token del bot (secret) |
+| `TELEGRAM_CHAT_ID` | **Servidor** | Opcional | Chat ID del dueño (secret) |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_SECURE` | **Servidor** | Para enviar email | Host SMTP (Gmail: smtp.gmail.com, 587, false) |
+| `SMTP_USER` | **Servidor** | Para enviar email | Usuario SMTP (email completo) |
+| `SMTP_PASS` | **Servidor** | Para enviar email | **App Password** de Gmail (16 caracteres). Nunca tu password normal. |
+| `SMTP_FROM` | **Servidor** | Para enviar email | `"ROHU Solutions <hgomezgonzalez@gmail.com>"` |
+| `SMTP_TO` | **Servidor** | Para enviar email | Destino del correo (puede ser el mismo remitente) |
 | `LEAD_API_URL` | **Servidor** | Opcional | Webhook CRM al que reenviar cada lead |
 
-> ⚠️ Nunca prefijes secretos con `NEXT_PUBLIC_`. Los `NEXT_PUBLIC_*` se exponen al navegador.
+> ⚠️ **Seguridad crítica**: los valores de `SMTP_PASS`, `TELEGRAM_BOT_TOKEN` y `TELEGRAM_CHAT_ID` son **secretos**. Van en `.env.local` (gitignored) o en Heroku Config Vars. **Nunca** los commitees al repo. **Nunca** los prefijees con `NEXT_PUBLIC_` — eso los expone al navegador.
+
+---
+
+## Configurar notificaciones por correo (Gmail SMTP)
+
+Cada vez que un lead envía el formulario, se dispara un correo al dueño con todos los datos y botones "Responder por WhatsApp" y "Abrir email". Usamos Gmail con **App Password** porque es gratuito, seguro y funciona sin verificar dominios.
+
+### Paso 1 — Activar 2FA en tu cuenta Google
+Ve a https://myaccount.google.com/security → **Verificación en 2 pasos** → activa. Esto es **requisito** para generar App Passwords.
+
+### Paso 2 — Generar una App Password
+1. Abre https://myaccount.google.com/apppasswords
+2. En "Nombre de la aplicación" escribe: `ROHU Marketing Web`
+3. Click **Crear**.
+4. **Copia el token de 16 caracteres** que Google muestra (ejemplo: `abcd efgh ijkl mnop`). Google **no volverá a mostrarlo**, así que guárdalo de inmediato.
+
+### Paso 3 — Configurar `.env.local`
+```env
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=hgomezgonzalez@gmail.com
+SMTP_PASS=abcd efgh ijkl mnop
+SMTP_FROM="ROHU Solutions <hgomezgonzalez@gmail.com>"
+SMTP_TO=hgomezgonzalez@gmail.com
+```
+Nodemailer acepta el token con o sin espacios.
+
+### Paso 4 — Probar
+```bash
+npm run dev
+```
+Abre http://localhost:3000/#contact, llena el formulario y envíalo. En menos de 10 segundos debes recibir un correo con:
+- Subject: `🟢 Nuevo lead · ROHU Solutions · <app> · <nombre>`
+- HTML con tabla de datos + botones "Responder por WhatsApp" y "Abrir email"
+- `Reply-To` apuntando al correo del lead (puedes responder directamente con "Responder")
+
+### Paso 5 — Producción (Heroku)
+```bash
+heroku config:set \
+  SMTP_HOST=smtp.gmail.com \
+  SMTP_PORT=587 \
+  SMTP_SECURE=false \
+  SMTP_USER=hgomezgonzalez@gmail.com \
+  SMTP_PASS="abcd efgh ijkl mnop" \
+  SMTP_FROM="ROHU Solutions <hgomezgonzalez@gmail.com>" \
+  SMTP_TO=hgomezgonzalez@gmail.com
+```
+
+> Si no configuras SMTP, el formulario **sigue funcionando** — el lead se persiste y se envía a Telegram/CRM si están configurados. Solo se omite el email con un `console.warn`.
+
+**Límites de Gmail SMTP**: ~500 emails/día para cuentas gratuitas. Más que suficiente para leads iniciales. Cuando escales, migra a Resend o SendGrid cambiando solo las env vars `SMTP_*`.
 
 ---
 
 ## Configuración del bot de Telegram
 
-El bot notifica al dueño del negocio **cada vez que un lead envía el formulario**. Así puede responder en tiempo real desde el celular sin estar "siempre en la web".
+Opcional pero muy recomendado. Permite recibir notificaciones push instantáneas en el móvil.
 
-### Paso 1 — Crear el bot
 1. Abre Telegram → busca [`@BotFather`](https://t.me/BotFather) → envía `/newbot`.
-2. Elige un nombre y un username (debe terminar en `bot`).
-3. **Copia el TOKEN** que te devuelve BotFather.
-
-### Paso 2 — Autorizar al bot para enviarte mensajes
-1. Abre el bot recién creado.
-2. Envíale `/start` (esto "abre" la conversación y permite que te escriba).
-
-### Paso 3 — Obtener tu chat ID
-1. Abre en tu navegador: `https://api.telegram.org/bot<TOKEN>/getUpdates`
-   (reemplaza `<TOKEN>` por tu token real).
-2. Busca un bloque similar a `"chat":{"id":123456789,...}`.
-3. **Copia ese número** — es tu `TELEGRAM_CHAT_ID`.
-
-### Paso 4 — Configurar en `.env.local`
-```env
-TELEGRAM_BOT_TOKEN=123456789:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
-TELEGRAM_CHAT_ID=123456789
-```
-
-### Paso 5 — Probar el envío
-Envía un formulario de prueba desde la landing. En menos de 3 segundos debes recibir un mensaje en Telegram con los datos del lead y dos botones inline:
-- **📲 Responder por WhatsApp** — abre la conversación con el `wa.me` del propio lead.
-- **✉️ Abrir email** — abre el cliente de correo con el email del lead.
-
-### Prueba manual con curl
-```bash
-curl -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-  -H "Content-Type: application/json" \
-  -d "{\"chat_id\":\"${TELEGRAM_CHAT_ID}\",\"text\":\"Test desde ROHU Marketing Web\"}"
-```
-
-> Si no configuras Telegram, el formulario **sigue funcionando** — el lead se persiste en `data/leads.json` (o se reenvía al webhook CRM si está configurado). Solo se omite la notificación push.
+2. Elige nombre y username (debe terminar en `bot`).
+3. **Copia el TOKEN** que devuelve BotFather.
+4. Abre tu bot → envía `/start` (esto autoriza al bot a escribirte).
+5. Abre en navegador: `https://api.telegram.org/bot<TOKEN>/getUpdates`
+6. Busca `"chat":{"id":123456789,...}` → **copia ese número**.
+7. Pega en `.env.local`:
+   ```env
+   TELEGRAM_BOT_TOKEN=123456789:ABC-DEF...
+   TELEGRAM_CHAT_ID=123456789
+   ```
 
 ---
 
 ## Despliegue GitHub → Heroku
 
-**Principio:** el código vive en GitHub como fuente de verdad. Heroku se suscribe al repo y despliega automáticamente en cada push a `main`. **Nunca se usa `git push heroku main`.**
+**Principio:** GitHub es fuente de verdad. Heroku se suscribe al repo y despliega automáticamente en cada push a `main`. **Nunca se usa `git push heroku main`.**
 
 ### 1. Publicar el scaffold a GitHub
 
 ```bash
 cd rohu-marketing-web
-git init -b main
+git status                                 # verifica qué va a commitearse
+git diff --staged                          # revisa que NO haya .env.local ni secretos
 git add .
-git commit -m "chore: initial rohu marketing web scaffold"
+git commit -m "feat: rebrand to rohu solutions with multi-app registry"
 
 # Opción A — con gh CLI (recomendada)
 gh repo create rohu-marketing-web --public --source=. --remote=origin --push
@@ -199,127 +273,106 @@ heroku create rohu-marketing-web
 heroku config:set \
   NEXT_PUBLIC_SITE_URL=https://rohu-marketing-web.herokuapp.com \
   NEXT_PUBLIC_DEMO_URL=https://rohu-contable-prod-3fba93dd2eb4.herokuapp.com/ \
-  NEXT_PUBLIC_DEMO_USER=rohu-contable \
-  NEXT_PUBLIC_DEMO_PASSWORD=rohu-contable \
+  NEXT_PUBLIC_DEMO_USER=demo@rohu-contable.com \
+  NEXT_PUBLIC_DEMO_PASSWORD=demo1234 \
   NEXT_PUBLIC_WHATSAPP_PHONE=57300XXXXXXX \
-  "NEXT_PUBLIC_WHATSAPP_DEFAULT_MESSAGE=Hola, me interesa ROHU Contable y quiero más información." \
-  TELEGRAM_BOT_TOKEN=tu_token_aqui \
-  TELEGRAM_CHAT_ID=tu_chat_id_aqui \
+  "NEXT_PUBLIC_WHATSAPP_DEFAULT_MESSAGE=Hola, me interesa ROHU Solutions y quiero más información." \
+  SMTP_HOST=smtp.gmail.com \
+  SMTP_PORT=587 \
+  SMTP_SECURE=false \
+  SMTP_USER=hgomezgonzalez@gmail.com \
+  SMTP_PASS="tu-app-password-de-gmail" \
+  "SMTP_FROM=ROHU Solutions <hgomezgonzalez@gmail.com>" \
+  SMTP_TO=hgomezgonzalez@gmail.com \
   NPM_CONFIG_PRODUCTION=false
 ```
 
-### 3. Conectar Heroku al repo de GitHub (UI, una sola vez)
+### 3. Conectar Heroku al repo (UI, una sola vez)
 
-1. Heroku Dashboard → tu app → pestaña **Deploy**.
+1. Heroku Dashboard → tu app → **Deploy**.
 2. **Deployment method** → **GitHub** → **Connect to GitHub** → autoriza.
 3. Busca `rohu-marketing-web` → **Connect**.
-4. Sección **Automatic deploys** → selecciona rama `main` → **Enable Automatic Deploys**.
-5. Sección **Manual deploy** → **Deploy Branch** (primer deploy).
+4. **Automatic deploys** → rama `main` → **Enable Automatic Deploys**.
+5. **Manual deploy** → **Deploy Branch** (primer deploy).
 
 ### 4. Flujo diario
 
 ```bash
-git checkout -b feat/update-copy
-# ...editar...
-git commit -am "feat(hero): update headline variant"
-git push origin feat/update-copy
-# abrir PR en GitHub → mergear a main → Heroku despliega automáticamente.
+git checkout -b feat/new-app
+# agrega una entrada en src/lib/applications.ts con status: 'live'
+npm run build                              # verifica localmente
+git commit -am "feat(applications): add rohu-restaurantes"
+git push origin feat/new-app
+# abrir PR → mergear a main → Heroku despliega solo.
 ```
 
 ### Despliegue alternativo: Vercel
 
 ```bash
-# con vercel CLI
 npm i -g vercel
 vercel
-# agregar variables de entorno desde el dashboard de Vercel
+# agrega las variables de entorno desde el dashboard de Vercel
 ```
 
 ---
 
 ## Checklist final
 
-### Performance
-- [ ] Lighthouse Performance ≥ 90 (mobile + desktop)
-- [ ] LCP < 2.5s, CLS < 0.1, INP < 200ms
-- [ ] Imágenes con `next/image` y `priority` solo en hero
-- [ ] Fuentes con `display: 'swap'` via `next/font/google`
+### Bugfix formulario (Fase 2)
+- [ ] Llenar el formulario en `/productos/rohu-contable` con datos válidos → redirige a `/gracias` sin campos rojos.
+- [ ] `data/leads.json` contiene el lead con `application: 'rohu-contable'`.
 
-### Responsive
-- [ ] Mobile 375px: hero legible, CTAs apilados, formulario en una columna
-- [ ] Tablet 768px: grids 2 columnas
-- [ ] Desktop 1280px: grids 3-4 columnas, hero split 2 cols
+### SMTP
+- [ ] `.env.local` tiene `SMTP_PASS` con un App Password válido.
+- [ ] Envío de formulario → en <10s llega un correo al `SMTP_TO` con los datos del lead.
+- [ ] El subject incluye el nombre del lead y la aplicación seleccionada.
+- [ ] El `Reply-To` apunta al correo del lead (puedes responder directo).
+- [ ] Sin `SMTP_PASS` el formulario sigue funcionando (email omitido con `console.warn`).
 
-### Accesibilidad (WCAG AA)
-- [ ] Contraste verificado (primary #1E3A8A / background #F8FAFC pasa AA)
-- [ ] `lang="es-CO"` en `<html>`
-- [ ] Skip-to-content link
-- [ ] Labels asociados a inputs, `aria-describedby` en errores
-- [ ] Accordion con `aria-expanded` / `aria-controls`
-- [ ] Foco visible con `:focus-visible`
-- [ ] Imágenes con `alt` descriptivo
+### Multi-app
+- [ ] `/` muestra home corporativa con hero + grid dinámico de aplicaciones.
+- [ ] `ROHU Contable` aparece con badge "Disponible" y CTA activo.
+- [ ] Las apps `coming_soon` (Restaurantes, Inmobiliario, Salud, Educación) aparecen con badge "Próximamente" y CTA deshabilitado.
+- [ ] Click en "ROHU Contable" → va a `/productos/rohu-contable` con la landing completa.
+- [ ] URL inválida `/productos/foo` → 404 con link a `/`.
+- [ ] El formulario de `/productos/rohu-contable` tiene "Aplicación de interés" pre-seleccionado en "ROHU Contable".
+- [ ] El formulario de `/` muestra "Asesoría general" por default.
 
-### SEO
-- [ ] `<title>` y `<meta description>` únicos por página
-- [ ] Open Graph y Twitter cards configurados
-- [ ] JSON-LD de `Organization` y `SoftwareApplication`
-- [ ] `/sitemap.xml` y `/robots.txt` responden 200
-- [ ] Canonical URL correcta
+### Performance + SEO
+- [ ] `npm run build` sin errores ni warnings críticos.
+- [ ] `/sitemap.xml` incluye `/`, `/productos/rohu-contable`, `/privacidad`, `/terminos`.
+- [ ] Lighthouse ≥ 90 en mobile y desktop (home y página de app).
+- [ ] JSON-LD `Organization` en `/`; `SoftwareApplication` en `/productos/[slug]`.
+- [ ] Title de `/` es `ROHU Solutions — Soluciones tecnológicas para el comercio colombiano`.
+- [ ] Title de `/productos/rohu-contable` es `ROHU Contable · ROHU Solutions`.
+
+### Accesibilidad y responsive
+- [ ] WCAG AA contrastes OK.
+- [ ] Mobile 375px / tablet 768px / desktop 1280px se ven bien.
+- [ ] Nav mobile con hamburger funciona.
+- [ ] Skip-to-content link accesible.
 
 ### Seguridad
-- [ ] `.env.local` no versionado
-- [ ] `data/leads.json` gitignored
-- [ ] Headers de seguridad en `next.config.mjs`
-- [ ] Rate limit en `/api/leads`
-- [ ] Honeypot anti-bot
-- [ ] Token de Telegram NO expuesto al cliente (nunca `NEXT_PUBLIC_`)
-- [ ] Credenciales demo con aviso "datos ficticios"
-
-### Legal
-- [ ] Disclaimer DIAN en footer
-- [ ] Checkbox Habeas Data obligatorio en formulario
-- [ ] Páginas `/privacidad` y `/terminos` completadas con datos reales y revisadas por abogado colombiano antes de producción
-- [ ] Lista de frases prohibidas aplicada al copy
-
-### Tracking
-- [ ] `view_landing` dispara una vez por sesión
-- [ ] `click_demo`, `copy_demo_credentials`, `click_pricing` disparan
-- [ ] `submit_lead` → `submit_lead_success` / `submit_lead_error`
-- [ ] `click_whatsapp_fab`, `click_whatsapp_hero`, `click_telegram` disparan
-- [ ] QA manual: abrir DevTools y verificar `window.dataLayer`
+- [ ] `.env.local` NO en git status.
+- [ ] `data/leads.json` gitignored.
+- [ ] `SMTP_PASS` y `TELEGRAM_BOT_TOKEN` en Config Vars de Heroku, nunca en el repo.
+- [ ] Credenciales demo marcadas como "datos ficticios — acceso público".
 
 ---
 
-## Coordinación de agentes (resumen)
+## Resumen de orquestación de agentes
 
-Esta web fue entregada orquestando **10 agentes especializados** con contratos explícitos entre ellos. Cada agente aportó su pieza y yo (orquestador) consolidé los entregables en código. Resumen del aporte real de cada uno:
+Este sitio fue construido orquestando **10 agentes especializados** (ROHU brand/copy/legal/analytics/payments/CRM/support/funnel/growth/frontend) en dos fases:
 
-| Agente | Aporte entregado |
-|---|---|
-| **rohu-growth-marketing-lead** | ICP priorizado (3 segmentos), propuesta de valor única, variantes de H1/sub, CTAs primarios, criterios de diferenciación de los 3 tiers, North Star metric (`lead_conversion_rate`) |
-| **rohu-brand-designer** | Sistema visual: tokens Tailwind finales (paleta + fuentes Manrope/Inter + sombras `card`/`elevated`/`signature` + radii + gradientes `gradient-hero` y `gradient-cta`), guía de uso del logo, iconografía Lucide outline 1.75 |
-| **rohu-conversion-copywriter** | Copy completo en español legal-safe para Hero, Beneficios, Para quién, Cómo funciona, Módulos, Pricing, Prueba social, FAQs, CTA final, Footer y Thank-you. Centralizado en `src/lib/content.ts` |
-| **rohu-legal-compliance-co** | Disclaimer DIAN canónico (corto footer + largo T&C), aviso credenciales demo, checkbox Habeas Data, tooltip externo WhatsApp/Telegram, esqueletos de `/privacidad` y `/terminos` con H2s aprobados, lista de 8 frases prohibidas de marketing |
-| **rohu-web-funnel-designer** | Jerarquía visual de la landing, wireframe ASCII del Hero + formulario + footer, microcopy completo del formulario (labels, placeholders, helpers, errores), flow mobile, estados visuales, regla de jerarquía de CTAs por sección |
-| **rohu-analytics-tracking** | Taxonomía de 12 eventos con props tipadas, props comunes (`ts`, `path`, `session_id`), funnel de conversión de 5 pasos, definición de North Star + 3 KPIs secundarios, QA manual por evento |
-| **rohu-payments-billing-engineer** | Tabla comparativa de los 3 tiers, interface `PricingTier` con campos reservados para integración futura (`stripePriceId`, `wompiPlanRef`, `monthlyPriceCOP`), stub de upgrade a pasarela, recomendación Wompi como primario para Colombia |
-| **rohu-crm-lifecycle-specialist** | Secuencia post-lead de 4 toques (WhatsApp inmediato → email +24h → WhatsApp +3d → email +7d), mapping de campos a HubSpot/Pipedrive, 3 segmentos iniciales, script de apertura WhatsApp, definición MQL→SQL |
-| **rohu-support-onboarding** | Refinamiento de los 4 pasos de "Cómo funciona" (con hints), copy completo de `/gracias` con 3 next-steps, 5 FAQs operativas (datos, offline, migración, capacitación, horarios), 3 KPIs de soporte (time-to-first-response, CSAT, self-service rate) |
-| **rohu-landing-frontend-engineer** *(yo, como ejecutor)* | Next.js 14 App Router + TypeScript + Tailwind, consolidación de todos los outputs en código, headers de seguridad, SEO técnico (metadata, sitemap, robots, JSON-LD), integración WhatsApp/Telegram, API route con zod + rate limit + honeypot, rutas legales, README completo |
+**Fase 1** — Scaffold inicial como landing de ROHU Contable. Los agentes aportaron: ICP, propuesta de valor, tokens Tailwind, copy completo, disclaimer DIAN canónico, texto Habeas Data, taxonomía de eventos, mapping CRM, FAQs operativas y copy de la página `/gracias`.
 
-### Puntos de sincronización respetados
-1. **Growth → todos**: ICP y tiers alimentaron copy, pricing, CRM y funnel.
-2. **Copy + Legal**: el copywriter respetó las 8 frases prohibidas del agente legal y usó el disclaimer DIAN canónico en footer y FAQ de DIAN.
-3. **Brand → Frontend**: tokens Tailwind aplicados al pie de la letra en `tailwind.config.ts` y `globals.css`.
-4. **Analytics → Frontend**: constante `EVENTS` exportada, un único `trackEvent()`, llamadas en cada CTA según taxonomía.
-5. **QA cruzado**: legal revisó `/privacidad` y `/terminos`; support revisó copy de `/gracias`; analytics definió la checklist de QA de eventos incluida arriba.
+**Fase 2** — Bugfix forwardRef del formulario, integración SMTP con Gmail App Password y rebrand a ROHU Solutions con arquitectura multi-aplicación. Los agentes validaron el posicionamiento corporativo, el sistema visual para multi-app (ApplicationCard, badges de status), el copy corporativo (home, about, proceso, FAQs corporativas) y los nuevos eventos de analytics.
 
----
+Ver detalles completos del plan en: `~/.claude/plans/crystalline-jumping-dusk.md`
 
-## Notas y próximos pasos
+### Notas y próximos pasos
 
-- **Persistencia de leads en producción**: `data/leads.json` es **solo para desarrollo**. En Heroku, el filesystem es efímero; cada reinicio borra el archivo. En producción real: configurar `LEAD_API_URL` hacia un CRM/webhook (HubSpot, Pipedrive, Zapier, Notion) o migrar a una base de datos administrada (Postgres, Supabase).
-- **WhatsApp Business Cloud API**: upgrade futuro para recibir también los formularios por WhatsApp con notificaciones push más ricas (requiere número dedicado + verificación de Meta).
-- **Checkout real**: cuando Wompi o Stripe se integren, las interfaces `PricingTier` y el botón `Cotizar ahora` se reemplazan por un flujo de suscripción (ver stub en `src/lib/pricingTiers.ts`).
-- **Analytics avanzado**: conectar GA4 y PostHog leyendo los eventos del `window.dataLayer` (ya están formateados para eso).
-- **Legal**: las páginas `/privacidad` y `/terminos` son esqueletos aprobados pero **deben ser revisados por un abogado habilitado en Colombia** antes de publicar en producción.
+- **Persistencia en producción**: `data/leads.json` es solo para desarrollo. En Heroku (filesystem efímero) los leads se guardan únicamente por email y por Telegram. Para producción real, configurar `LEAD_API_URL` hacia un CRM o migrar a Postgres/Supabase.
+- **Nuevas apps**: usar el registry en `src/lib/applications.ts` siguiendo los 4 pasos de "Cómo agregar una nueva aplicación al catálogo".
+- **Checkout real**: cuando se integre Wompi o Stripe, la interface `PricingTier` ya tiene los campos `stripePriceId`, `wompiPlanRef`, `monthlyPriceCOP` reservados.
+- **Legal**: las páginas `/privacidad` y `/terminos` son esqueletos aprobados pero **deben ser revisados por un abogado habilitado en Colombia** antes de producción.

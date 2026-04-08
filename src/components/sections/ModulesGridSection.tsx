@@ -1,20 +1,29 @@
 import { Container } from '@/components/ui/Container';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { DynamicIcon } from '@/components/ui/DynamicIcon';
-import { modules, modulesSection } from '@/lib/modules';
 
-export function ModulesGridSection() {
+type ModuleItem = {
+  id: string;
+  label: string;
+  description: string;
+  icon: string;
+};
+
+type Props = {
+  eyebrow: string;
+  title: string;
+  subtitle?: string;
+  items: readonly ModuleItem[];
+};
+
+export function ModulesGridSection({ eyebrow, title, subtitle, items }: Props) {
   return (
     <section id="modules" className="section">
       <Container>
-        <SectionHeading
-          eyebrow={modulesSection.eyebrow}
-          title={modulesSection.section_title}
-          subtitle={modulesSection.section_subtitle}
-        />
+        <SectionHeading eyebrow={eyebrow} title={title} subtitle={subtitle} />
 
         <ul className="mt-12 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {modules.map((mod) => (
+          {items.map((mod) => (
             <li
               key={mod.id}
               className="rounded-brand-lg border border-brand-border bg-white p-5 flex items-start gap-4 shadow-card transition-all hover:border-primary/40 hover:-translate-y-0.5"

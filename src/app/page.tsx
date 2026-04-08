@@ -1,29 +1,40 @@
 import { Suspense } from 'react';
-import { HeroSection } from '@/components/sections/HeroSection';
-import { BenefitsSection } from '@/components/sections/BenefitsSection';
-import { AudienceSection } from '@/components/sections/AudienceSection';
-import { HowItWorksSection } from '@/components/sections/HowItWorksSection';
-import { ModulesGridSection } from '@/components/sections/ModulesGridSection';
-import { PricingSection } from '@/components/sections/PricingSection';
+import { CompanyHeroSection } from '@/components/sections/CompanyHeroSection';
+import { ApplicationsGridSection } from '@/components/sections/ApplicationsGridSection';
+import { AboutCompanySection } from '@/components/sections/AboutCompanySection';
+import { CompanyProcessSection } from '@/components/sections/CompanyProcessSection';
 import { SocialProofSection } from '@/components/sections/SocialProofSection';
 import { FaqSection } from '@/components/sections/FaqSection';
 import { CtaSection } from '@/components/sections/CtaSection';
-import { LandingViewTracker } from '@/components/LandingViewTracker';
+import { CompanyViewTracker } from '@/components/CompanyViewTracker';
+import { companyContent } from '@/lib/content';
 
-export default function LandingPage() {
+export default function CompanyHomePage() {
   return (
     <>
-      <LandingViewTracker />
-      <HeroSection />
-      <BenefitsSection />
-      <AudienceSection />
-      <HowItWorksSection />
-      <ModulesGridSection />
-      <PricingSection />
-      <SocialProofSection />
-      <FaqSection />
+      <CompanyViewTracker />
+      <CompanyHeroSection />
+      <ApplicationsGridSection />
+      <AboutCompanySection />
+      <CompanyProcessSection />
+      <SocialProofSection
+        eyebrow={companyContent.socialProof.eyebrow}
+        title={companyContent.socialProof.section_title}
+        disclaimer={companyContent.socialProof.disclaimer}
+        testimonials={companyContent.socialProof.testimonials}
+      />
+      <FaqSection
+        eyebrow={companyContent.faqs.eyebrow}
+        title={companyContent.faqs.section_title}
+        subtitle={companyContent.faqs.section_subtitle}
+        items={companyContent.faqs.items}
+      />
       <Suspense fallback={null}>
-        <CtaSection />
+        <CtaSection
+          eyebrow={companyContent.ctaFinal.eyebrow}
+          title={companyContent.ctaFinal.section_title}
+          body={companyContent.ctaFinal.body}
+        />
       </Suspense>
     </>
   );

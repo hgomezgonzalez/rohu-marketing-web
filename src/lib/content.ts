@@ -1,204 +1,252 @@
 /**
- * Single source of truth for all user-facing Spanish copy.
- * Copy was produced and validated by the conversion-copywriter, legal-compliance
- * and support-onboarding agents. Any change must go through the same review cycle.
+ * Corporate content for ROHU Solutions (parent company).
+ *
+ * Every application-specific copy lives in `src/lib/applications.ts` inside
+ * the corresponding `Application` entry. This file only holds:
+ *   - `siteConfig`: global metadata (name, description, keywords, locale)
+ *   - `companyContent`: copy shown on the corporate home (/), Header, Footer,
+ *     thank-you page and shared legal snippets.
+ *
+ * Copy was produced and validated by the conversion-copywriter and
+ * legal-compliance agents.
  */
 
 export const siteConfig = {
-  name: 'ROHU Contable',
+  name: 'ROHU Solutions',
+  legalName: 'ROHU Soluciones',
   brand: 'ROHU',
   description:
-    'Software contable colombiano con POS, inventario, contabilidad PUC/NIIF y reportes. Diseñado para ferreterías, tiendas y comercios en Colombia.',
+    'ROHU Solutions desarrolla aplicaciones SaaS para el comercio y las pymes colombianas. Soluciones tecnológicas apalancadas en conocimientos contables y operacionales.',
+  tagline: 'Soluciones tecnológicas para el comercio colombiano',
   locale: 'es-CO',
   keywords: [
-    'software contable colombia',
+    'ROHU Solutions',
+    'software colombia',
+    'SaaS colombia',
+    'ROHU Contable',
+    'soluciones tecnológicas pymes',
+    'software contable',
     'POS colombia',
-    'inventario',
     'contabilidad PUC',
     'NIIF',
-    'ferreterías',
-    'tiendas',
-    'ROHU Contable',
   ],
 } as const;
 
-export const content = {
+export const companyContent = {
   nav: {
     items: [
-      { id: 'benefits', label: 'Beneficios', href: '#benefits' },
-      { id: 'modules', label: 'Módulos', href: '#modules' },
-      { id: 'pricing', label: 'Planes', href: '#pricing' },
+      { id: 'applications', label: 'Aplicaciones', href: '#applications' },
+      { id: 'about', label: 'Sobre nosotros', href: '#about' },
+      { id: 'process', label: 'Proceso', href: '#process' },
       { id: 'faqs', label: 'Preguntas', href: '#faqs' },
       { id: 'contact', label: 'Contacto', href: '#contact' },
     ],
-    cta_primary: 'Probar Demo',
+    cta_primary: 'Hablar con un asesor',
   },
 
   hero: {
-    eyebrow: 'ROHU Contable · SaaS colombiano',
-    h1: 'Controla tu negocio y tu contabilidad desde un solo lugar',
+    eyebrow: 'ROHU Solutions · Colombia',
+    h1: 'Soluciones tecnológicas para el comercio y las pymes colombianas',
     subheadline:
-      'Software diseñado para comercios colombianos que quieren orden, claridad y menos papeleo. Funciona online y offline.',
-    cta_primary_label: 'Probar Demo',
-    cta_secondary_label: 'Solicitar Implementación',
-    cta_tertiary_label: 'Chatear por WhatsApp',
-    demo_block: {
-      title: 'Acceso demo público',
-      notice:
-        'Acceso público de uso demostrativo: los datos que aparecen son ficticios. No ingreses información real.',
-      user_label: 'Usuario',
-      password_label: 'Contraseña',
-      copy_user: 'Copiar usuario',
-      copy_password: 'Copiar contraseña',
-      open_demo: 'Entrar al Demo',
-      copied_toast: '¡Copiado al portapapeles!',
-    },
+      'Desarrollamos aplicaciones SaaS pensadas para tu sector, con rigor contable y acompañamiento real. Elige la que te calza o pídenos asesoría.',
+    cta_primary_label: 'Ver nuestras aplicaciones',
+    cta_secondary_label: 'Hablar con un asesor',
   },
 
-  benefits: {
-    eyebrow: 'Beneficios',
-    section_title: 'Todo lo que tu negocio necesita en un solo sistema',
+  applicationsSection: {
+    eyebrow: 'Nuestras aplicaciones',
+    section_title: 'Un catálogo que crece con tu negocio',
     section_subtitle:
-      'Desde el mostrador hasta los estados financieros, cubrimos la operación completa de tu comercio.',
-    cards: [
-      {
-        id: 'pos',
-        title: 'POS rápido con QR',
-        description: 'Registra ventas en segundos con código QR, sin filas ni errores.',
-        icon: 'ScanLine',
-      },
-      {
-        id: 'inventory',
-        title: 'Inventario y stock',
-        description: 'Conoce en tiempo real cuánto tienes, qué se mueve y qué reponer.',
-        icon: 'PackageSearch',
-      },
-      {
-        id: 'purchases',
-        title: 'Compras y proveedores',
-        description: 'Gestiona órdenes de compra y cuentas por pagar desde un solo módulo.',
-        icon: 'Truck',
-      },
-      {
-        id: 'accounting',
-        title: 'Contabilidad PUC/NIIF',
-        description: 'Registros contables alineados al Plan Único de Cuentas y estándares NIIF.',
-        icon: 'BookOpenCheck',
-      },
-      {
-        id: 'financial_statements',
-        title: 'Estados financieros',
-        description: 'Balance general, PyG y flujo de caja generados desde tus propias transacciones.',
-        icon: 'FileBarChart2',
-      },
-      {
-        id: 'reports',
-        title: 'Reportes y alertas',
-        description: 'Tablero visual con indicadores clave y alertas para decisiones a tiempo.',
-        icon: 'LineChart',
-      },
-      {
-        id: 'offline',
-        title: 'Online y offline',
-        description: 'Sigue vendiendo sin internet; los datos se sincronizan cuando vuelve la conexión.',
-        icon: 'Wifi',
-      },
-    ],
+      'Cada aplicación está pensada para un sector y una necesidad específica. Todas comparten el mismo rigor contable y el mismo acompañamiento.',
+    cta_live: 'Ver detalles',
+    cta_coming_soon: 'Recibir aviso',
+    cta_beta: 'Probar beta',
+    badge_live: 'Disponible',
+    badge_coming_soon: 'Próximamente',
+    badge_beta: 'Beta',
   },
 
-  audience: {
-    eyebrow: 'Para quién es',
-    section_title: 'Diseñado para comercios como el tuyo',
-    chips: [
-      'Ferreterías',
-      'Tiendas de barrio',
-      'Papelerías',
-      'Tiendas de ropa',
-      'Minimercados',
-      'Distribuidoras y negocios similares',
+  about: {
+    eyebrow: 'Sobre ROHU Solutions',
+    section_title: 'Tecnología que entiende tu negocio y las normas del país',
+    paragraph:
+      'ROHU Solutions es una empresa colombiana que desarrolla aplicaciones SaaS para el comercio y las pymes. Combinamos tecnología moderna con conocimiento contable y operacional para que cumplir con las políticas colombianas sea simple y tranquilo. Cada herramienta que lanzamos nace de una necesidad real del mercado que ya vimos repetirse muchas veces.',
+    values: [
+      {
+        id: 'rigor',
+        title: 'Rigor contable',
+        description: 'Nuestras apps se alinean al Plan Único de Cuentas y a los estándares NIIF vigentes.',
+      },
+      {
+        id: 'tech',
+        title: 'Tecnología sólida',
+        description: 'Stacks modernos, datos respaldados y actualizaciones continuas sin interrumpir tu operación.',
+      },
+      {
+        id: 'support',
+        title: 'Acompañamiento real',
+        description: 'No desaparecemos después de la venta: te apoyamos en la implementación, capacitación y soporte.',
+      },
     ],
-    closing_line:
-      'Si vendes productos y quieres llevar la contabilidad en orden, ROHU Contable es para ti.',
+    closing: 'Queremos ser el equipo tecnológico de confianza para cientos de negocios colombianos.',
   },
 
-  how_it_works: {
-    eyebrow: 'Cómo funciona',
-    section_title: 'Empieza en cuatro pasos',
-    section_subtitle: 'Un proceso acompañado de principio a fin. Sin sorpresas.',
+  process: {
+    eyebrow: 'Cómo trabajamos',
+    section_title: 'Un proceso claro de principio a fin',
+    section_subtitle: 'Así es cómo acompañamos a cada cliente desde la primera conversación hasta la operación diaria.',
     steps: [
       {
         number: 1,
-        title: 'Prueba la demo',
-        description:
-          'Explora el sistema con datos ficticios y confirma que se ajusta a tu negocio.',
-        hint: 'No necesitas instalar nada ni dar tarjeta de crédito.',
+        title: 'Descubrimiento',
+        description: 'Escuchamos tu operación, entendemos tu sector y confirmamos qué aplicación te calza mejor.',
+        hint: 'Sin compromiso y sin costo.',
       },
       {
         number: 2,
-        title: 'Configuramos tu empresa',
-        description:
-          'Adaptamos el sistema a tu catálogo, proveedores y estructura contable.',
-        hint: 'Si ya tienes un Excel con tu inventario, lo importamos juntos.',
+        title: 'Propuesta a la medida',
+        description: 'Te entregamos una propuesta con alcance, plan y tiempos claros, sin sorpresas.',
+        hint: 'Tú decides cuándo avanzar.',
       },
       {
         number: 3,
-        title: 'Capacitación rápida',
-        description:
-          'Te enseñamos a usar cada módulo; sin tecnicismos, sin curvas largas.',
-        hint: 'Grabamos la sesión para que la repasen cuando quieran.',
+        title: 'Implementación',
+        description: 'Configuramos la aplicación con tus datos y capacitamos a tu equipo en sesiones cortas.',
+        hint: 'Nos aseguramos de que todos sepan usarla antes de salir a producción.',
       },
       {
         number: 4,
-        title: 'Soporte y actualizaciones',
-        description:
-          'Acompañamiento continuo y mejoras periódicas incluidas en tu plan.',
-        hint: 'Cada mejora llega sola, sin que tengas que hacer nada.',
+        title: 'Soporte y evolución',
+        description: 'Te acompañamos con soporte humano, actualizaciones continuas y mejoras según tu crecimiento.',
+        hint: 'Nunca quedas solo con el sistema.',
       },
     ],
   },
 
-  social_proof: {
+  socialProof: {
     eyebrow: 'Testimonios',
-    section_title: 'Lo que dicen negocios como el tuyo',
+    section_title: 'Lo que dicen nuestros clientes',
     disclaimer:
       'Los siguientes testimonios son ilustrativos y no corresponden a clientes reales identificados.',
     testimonials: [
       {
-        id: 't1',
+        id: 'ct1',
         quote:
-          'Desde que usamos ROHU, el cierre de caja es mucho más rápido y ya no perdemos ventas por no tener señal.',
-        name: 'Carlos M.',
-        role: 'Propietario',
-        business: 'Ferretería El Tornillo · Bogotá',
+          'Buscábamos una empresa que entendiera de tecnología Y de contabilidad colombiana. ROHU Solutions tiene ambas.',
+        name: 'Mariana T.',
+        role: 'Gerente general',
+        business: 'Distribuidora familiar · Bucaramanga',
       },
       {
-        id: 't2',
+        id: 'ct2',
         quote:
-          'Mi contador agradece que los estados financieros ya salen del sistema, sin armar todo en Excel.',
-        name: 'Adriana P.',
-        role: 'Administradora',
-        business: 'Papelería La Estrella · Medellín',
+          'La implementación fue guiada paso a paso y nuestro equipo aprendió rápido. Excelente acompañamiento.',
+        name: 'Andrés L.',
+        role: 'Administrador',
+        business: 'Cadena de minimercados · Cali',
       },
       {
-        id: 't3',
+        id: 'ct3',
         quote:
-          'El módulo de inventario nos ayudó a detectar productos que se perdían. Ahora tenemos más control.',
-        name: 'Jesús R.',
-        role: 'Dueño',
-        business: 'Minimercado El Vecino · Cali',
+          'Tener un proveedor local que responde rápido hace toda la diferencia. Nos sentimos respaldados.',
+        name: 'Paola H.',
+        role: 'Contadora externa',
+        business: 'Consultora contable · Medellín',
       },
-    ],
-    metrics: [
-      { id: 'm1', label: 'Vende en segundos', description: 'POS ágil pensado para el mostrador.' },
-      { id: 'm2', label: 'Controla tu stock', description: 'Sin hojas de cálculo, sin sorpresas.' },
-      { id: 'm3', label: 'Reportes claros', description: 'Información lista cuando la necesitas.' },
     ],
   },
 
-  cta_final: {
-    eyebrow: 'Solicita una implementación',
-    section_title: '¿Listo para poner orden en tu negocio?',
-    body: 'Cuéntanos sobre tu empresa y te mostramos cómo ROHU Contable se adapta a lo que necesitas. Sin compromisos, sin tecnicismos.',
+  faqs: {
+    eyebrow: 'Preguntas frecuentes',
+    section_title: 'Preguntas frecuentes sobre ROHU Solutions',
+    section_subtitle: 'Lo que más nos preguntan antes de empezar a trabajar juntos.',
+    items: [
+      {
+        id: 'who',
+        question: '¿Quiénes son ROHU Solutions?',
+        answer:
+          'Somos una empresa colombiana dedicada a desarrollar aplicaciones SaaS para el comercio y las pymes. Combinamos tecnología moderna con conocimiento contable y operacional del mercado local.',
+      },
+      {
+        id: 'location',
+        question: '¿Dónde están ubicados y a dónde llegan?',
+        answer:
+          'Operamos desde Colombia y atendemos a clientes en todo el territorio nacional de forma remota. Para implementaciones in-situ coordinamos visitas según necesidad.',
+      },
+      {
+        id: 'cost',
+        question: '¿Cuánto cuesta trabajar con ustedes?',
+        answer:
+          'Los costos dependen del tamaño de tu empresa y la aplicación que elijas. Nuestros planes se presentan como cotización personalizada tras una conversación de diagnóstico sin compromiso.',
+      },
+      {
+        id: 'time',
+        question: '¿Cuánto tarda una implementación típica?',
+        answer:
+          'Una implementación estándar toma entre 3 y 10 días hábiles. Proyectos con más sedes o migraciones complejas pueden tomar más tiempo; lo estimamos en la propuesta.',
+      },
+      {
+        id: 'custom',
+        question: '¿Qué pasa si necesito una app que no tienen en el catálogo?',
+        answer:
+          'Cuéntanos tu caso. Evaluamos si encaja en nuestra línea de producto y, si lo hace, lo incluimos en nuestra hoja de ruta. En algunos casos hacemos desarrollos a la medida.',
+      },
+      {
+        id: 'security',
+        question: '¿Mis datos y los de mis clientes están seguros?',
+        answer:
+          'Todos nuestros sistemas usan servidores con respaldo periódico y tratamos los datos personales conforme a la Ley 1581 de 2012 (Habeas Data). Consulta nuestra Política de Privacidad.',
+      },
+      {
+        id: 'support_after',
+        question: '¿Ofrecen soporte después de la implementación?',
+        answer:
+          'Sí. Cada aplicación incluye un plan de soporte continuo con canales de atención, actualizaciones y mejoras periódicas según tu plan.',
+      },
+      {
+        id: 'demo',
+        question: '¿Puedo pedir una demo antes de decidirme?',
+        answer:
+          'Por supuesto. Cada aplicación con demo pública tiene credenciales de prueba visibles en su página. Además, podemos agendar una demo guiada por videollamada.',
+      },
+    ],
+  },
+
+  ctaFinal: {
+    eyebrow: 'Hablemos',
+    section_title: '¿Listo para dar el siguiente paso?',
+    body: 'Cuéntanos sobre tu negocio y te ayudamos a elegir la aplicación adecuada. Si aún no sabes cuál te calza, elige "Asesoría general" y te orientamos sin compromiso.',
+  },
+
+  footer: {
+    tagline: 'Soluciones tecnológicas para el comercio colombiano.',
+    description:
+      'ROHU Solutions desarrolla aplicaciones SaaS apalancadas en conocimientos contables y operacionales para cumplir las políticas colombianas con tranquilidad.',
+    applications_title: 'Aplicaciones',
+    contact_title: 'Contáctanos',
+    legal_title: 'Legal',
+    company_title: 'Empresa',
+    links: {
+      privacy: 'Política de privacidad',
+      terms: 'Términos y condiciones',
+      contact: 'Contacto',
+      about: 'Sobre nosotros',
+      process: 'Cómo trabajamos',
+    },
+    copyright: `© ${new Date().getFullYear()} ROHU Soluciones. Todos los derechos reservados.`,
+    disclaimer_dian:
+      'ROHU Solutions ofrece herramientas de soporte informativo que no constituyen asesoría tributaria, contable ni jurídica. La presentación de declaraciones ante la DIAN, el cálculo de tributos y el cumplimiento de obligaciones fiscales son responsabilidad exclusiva del contribuyente y de su contador público titulado o revisor fiscal.',
+  },
+} as const;
+
+/**
+ * Content shared across any page: lead form, thank-you, legal snippets.
+ */
+export const commonContent = {
+  leadForm: {
+    application_label: 'Aplicación de interés',
+    application_helper:
+      'Elige la aplicación sobre la que quieres conversar. Si no estás seguro, selecciona "Asesoría general".',
     submit_label: 'Enviar solicitud',
     submit_loading: 'Enviando...',
     error_banner: {
@@ -209,30 +257,14 @@ export const content = {
     },
   },
 
-  footer: {
-    tagline: 'Tecnología contable pensada para el comercio colombiano.',
-    description:
-      'ROHU es una empresa de soluciones tecnológicas apalancada en conocimientos contables para ayudarte a cumplir la normativa colombiana con tranquilidad.',
-    contact_title: 'Contáctanos',
-    legal_title: 'Legal',
-    links: {
-      privacy: 'Política de privacidad',
-      terms: 'Términos y condiciones',
-      contact: 'Contacto',
-    },
-    copyright: `© ${new Date().getFullYear()} ROHU Soluciones. Todos los derechos reservados.`,
-    disclaimer_dian:
-      'ROHU es una herramienta de soporte informativo y no constituye asesoría tributaria, contable ni jurídica. La presentación de declaraciones ante la DIAN, el cálculo de tributos y el cumplimiento de obligaciones fiscales son responsabilidad exclusiva del contribuyente y de su contador público titulado o revisor fiscal.',
-  },
-
   thank_you: {
     h1: 'Recibimos tu solicitud',
     subtitle:
-      'Un asesor de ROHU revisará tu información y te escribirá en menos de 24 horas hábiles.',
-    body: 'Gracias por tu interés en ROHU Contable. Ya tenemos tus datos y estamos listos para mostrarte cómo ROHU puede ayudarte a llevar tu negocio con orden, sin complicaciones.',
+      'Un asesor de ROHU Solutions revisará tu información y te escribirá en menos de 24 horas hábiles.',
+    body: 'Gracias por tu interés en ROHU Solutions. Ya tenemos tus datos y estamos listos para conversar sobre cómo podemos ayudarte con tu negocio.',
     next_steps: [
-      'Revisa tu WhatsApp o correo — te escribiremos para agendar una demo personalizada.',
-      'Prepara una lista breve de tus productos o servicios principales. Nos ayuda a personalizar la demo.',
+      'Revisa tu WhatsApp o correo — te escribiremos para coordinar una demo personalizada.',
+      'Si ya tienes información de tu empresa o del sector, tenla a mano para agilizar la conversación.',
       'Si tienes preguntas urgentes, puedes escribirnos directamente ahora mismo.',
     ],
     cta_home: 'Volver al inicio',
@@ -243,7 +275,7 @@ export const content = {
 
   legal: {
     habeas_data_checkbox:
-      'He leído y acepto la Política de Privacidad de ROHU y autorizo el tratamiento de mis datos personales para las finalidades allí descritas, conforme a la Ley 1581 de 2012.',
+      'He leído y acepto la Política de Privacidad de ROHU Solutions y autorizo el tratamiento de mis datos personales para las finalidades allí descritas, conforme a la Ley 1581 de 2012.',
     external_link_tooltip:
       'Al hacer clic serás redirigido a una plataforma de terceros. ROHU no controla esos servicios y aplican sus propios términos.',
   },

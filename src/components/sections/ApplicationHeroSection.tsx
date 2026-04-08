@@ -3,14 +3,16 @@
 import { ArrowRight, ExternalLink, MessageCircle, Sparkles } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { DemoAccessBlock } from './DemoAccessBlock';
-import { content } from '@/lib/content';
+import type { Application } from '@/lib/applications';
+import { commonContent } from '@/lib/content';
 import { trackEvent, EVENTS } from '@/lib/analytics';
 import { buildWhatsAppUrl, getWhatsAppConfig } from '@/lib/contactChannels';
 
-const DEMO_URL =
-  process.env.NEXT_PUBLIC_DEMO_URL ?? 'https://rohu-contable-prod-3fba93dd2eb4.herokuapp.com/';
+type Props = {
+  app: Application;
+};
 
-export function HeroSection() {
+export function ApplicationHeroSection({ app }: Props) {
   const { phone, defaultMessage } = getWhatsAppConfig();
   const waHref = phone ? buildWhatsAppUrl(phone, defaultMessage) : null;
 
@@ -23,33 +25,40 @@ export function HeroSection() {
           <div className="flex flex-col gap-6 animate-fade-in-up">
             <span className="inline-flex items-center gap-2 self-start rounded-full bg-white/15 backdrop-blur px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white">
               <Sparkles size={14} strokeWidth={2.5} />
-              {content.hero.eyebrow}
+              {app.hero.eyebrow}
             </span>
 
             <h1 className="text-white leading-[1.1] text-4xl sm:text-5xl lg:text-6xl font-extrabold">
-              {content.hero.h1}
+              {app.hero.h1}
             </h1>
 
             <p className="text-lg sm:text-xl text-white/85 max-w-xl leading-relaxed">
-              {content.hero.subheadline}
+              {app.hero.subheadline}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
-              <a
-                href={DEMO_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => trackEvent(EVENTS.CLICK_DEMO, { cta_location: 'hero' })}
-                className="btn-cta px-7 py-4 text-base sm:text-lg"
-              >
-                {content.hero.cta_primary_label}
-                <ExternalLink size={18} strokeWidth={2} />
-              </a>
+              {app.demo && (
+                <a
+                  href={app.demo.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() =>
+                    trackEvent(EVENTS.CLICK_DEMO, {
+                      cta_location: 'hero',
+                      application_id: app.id,
+                    })
+                  }
+                  className="btn-cta px-7 py-4 text-base sm:text-lg"
+                >
+                  Probar Demo
+                  <ExternalLink size={18} strokeWidth={2} />
+                </a>
+              )}
               <a
                 href="#contact"
                 className="btn-base bg-white/15 border border-white/40 text-white hover:bg-white/25 px-7 py-4 text-base sm:text-lg"
               >
-                {content.hero.cta_secondary_label}
+                Solicitar Implementación
                 <ArrowRight size={18} strokeWidth={2} />
               </a>
             </div>
@@ -60,20 +69,25 @@ export function HeroSection() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() =>
-                  trackEvent(EVENTS.CLICK_WHATSAPP_HERO, { cta_location: 'hero' })
+                  trackEvent(EVENTS.CLICK_WHATSAPP_HERO, {
+                    cta_location: 'hero',
+                    application_id: app.id,
+                  })
                 }
                 className="inline-flex items-center gap-2 text-sm font-semibold text-white/90 hover:text-white transition-colors self-start"
-                title={content.legal.external_link_tooltip}
+                title={commonContent.legal.external_link_tooltip}
               >
                 <MessageCircle size={16} strokeWidth={2} />
-                {content.hero.cta_tertiary_label}
+                Chatear por WhatsApp
               </a>
             )}
           </div>
 
-          <div className="lg:pl-6">
-            <DemoAccessBlock />
-          </div>
+          {app.demo && (
+            <div className="lg:pl-6">
+              <DemoAccessBlock demo={app.demo} applicationId={app.id} />
+            </div>
+          )}
         </div>
       </Container>
     </section>

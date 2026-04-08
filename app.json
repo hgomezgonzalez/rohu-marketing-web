@@ -1,6 +1,6 @@
 {
-  "name": "ROHU Marketing Web",
-  "description": "Marketing and sales website for ROHU Contable (SaaS).",
+  "name": "ROHU Solutions Marketing Web",
+  "description": "Marketing and sales website for ROHU Solutions — a Colombian SaaS company with a catalog of business applications.",
   "repository": "https://github.com/your-org/rohu-marketing-web",
   "keywords": ["next", "nextjs", "marketing", "saas", "rohu", "colombia"],
   "buildpacks": [
@@ -19,11 +19,11 @@
     },
     "NEXT_PUBLIC_DEMO_USER": {
       "description": "Public demo username (fake data)",
-      "value": "rohu-contable"
+      "value": "demo@rohu-contable.com"
     },
     "NEXT_PUBLIC_DEMO_PASSWORD": {
       "description": "Public demo password (fake data)",
-      "value": "rohu-contable"
+      "value": "demo1234"
     },
     "NEXT_PUBLIC_WHATSAPP_PHONE": {
       "description": "Owner WhatsApp phone in E.164 without the leading +",
@@ -31,7 +31,7 @@
     },
     "NEXT_PUBLIC_WHATSAPP_DEFAULT_MESSAGE": {
       "description": "Pre-filled WhatsApp message",
-      "value": "Hola, me interesa ROHU Contable y quiero más información."
+      "value": "Hola, me interesa ROHU Solutions y quiero más información."
     },
     "NEXT_PUBLIC_TELEGRAM_USERNAME": {
       "description": "Optional public Telegram username (without @)",
@@ -43,6 +43,34 @@
     },
     "TELEGRAM_CHAT_ID": {
       "description": "Server-only chat ID where lead notifications are sent",
+      "required": false
+    },
+    "SMTP_HOST": {
+      "description": "SMTP server host (e.g. smtp.gmail.com)",
+      "value": "smtp.gmail.com"
+    },
+    "SMTP_PORT": {
+      "description": "SMTP server port",
+      "value": "587"
+    },
+    "SMTP_SECURE": {
+      "description": "SMTP TLS mode (true for port 465, false for 587 with STARTTLS)",
+      "value": "false"
+    },
+    "SMTP_USER": {
+      "description": "SMTP username (usually the sender email)",
+      "required": false
+    },
+    "SMTP_PASS": {
+      "description": "SMTP password. For Gmail, use a 16-char App Password (never your real password).",
+      "required": false
+    },
+    "SMTP_FROM": {
+      "description": "The From header of outgoing emails",
+      "required": false
+    },
+    "SMTP_TO": {
+      "description": "The destination email address for new-lead notifications",
       "required": false
     },
     "LEAD_API_URL": {

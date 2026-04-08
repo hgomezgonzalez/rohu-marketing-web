@@ -18,6 +18,11 @@ export const businessTypeOptions = [
   'Tienda de ropa',
   'Minimercado',
   'Distribuidora',
+  'Restaurante',
+  'Consultorio / clínica',
+  'Institución educativa',
+  'Inmobiliaria',
+  'Servicios profesionales',
   'Otro',
 ] as const;
 
@@ -30,6 +35,9 @@ export const numUsersOptions = [
 ] as const;
 
 export const leadFormSchema = z.object({
+  application: z
+    .string({ required_error: 'Selecciona una aplicación' })
+    .min(1, 'Selecciona una aplicación'),
   firstName: z
     .string({ required_error: 'Ingresa tu nombre completo' })
     .min(2, 'Ingresa tu nombre completo')
@@ -42,7 +50,7 @@ export const leadFormSchema = z.object({
   nit: z
     .string()
     .optional()
-    .refine((val) => !val || nitRegex.test(val), {
+    .refine((val) => !val || val.length === 0 || nitRegex.test(val), {
       message: 'El NIT debe tener formato válido (p. ej. 900.123.456-7)',
     }),
   city: z
@@ -55,12 +63,18 @@ export const leadFormSchema = z.object({
   whatsapp: z
     .string({ required_error: 'Déjanos tu WhatsApp para coordinar rápidamente' })
     .regex(phoneRegex, 'Debe tener al menos 7 dígitos (p. ej. 3001234567)'),
-  businessType: z.enum(businessTypeOptions, {
-    required_error: 'Selecciona el tipo que mejor describe tu negocio',
-  }),
-  numUsers: z.enum(numUsersOptions, {
-    required_error: 'Selecciona el número aproximado de usuarios',
-  }),
+  businessType: z
+    .string()
+    .optional()
+    .refine((val) => !val || businessTypeOptions.includes(val as (typeof businessTypeOptions)[number]), {
+      message: 'Selecciona una opción válida',
+    }),
+  numUsers: z
+    .string()
+    .optional()
+    .refine((val) => !val || numUsersOptions.includes(val as (typeof numUsersOptions)[number]), {
+      message: 'Selecciona una opción válida',
+    }),
   message: z.string().max(1000, 'Máximo 1000 caracteres').optional(),
   planInterest: z.string().max(40).optional(),
   habeasData: z.literal(true, {

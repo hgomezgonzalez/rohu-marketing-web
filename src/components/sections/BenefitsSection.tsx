@@ -2,20 +2,29 @@ import { Container } from '@/components/ui/Container';
 import { Card } from '@/components/ui/Card';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { DynamicIcon } from '@/components/ui/DynamicIcon';
-import { content } from '@/lib/content';
 
-export function BenefitsSection() {
+type BenefitCard = {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+};
+
+type Props = {
+  eyebrow: string;
+  title: string;
+  subtitle?: string;
+  cards: readonly BenefitCard[];
+};
+
+export function BenefitsSection({ eyebrow, title, subtitle, cards }: Props) {
   return (
     <section id="benefits" className="section bg-white">
       <Container>
-        <SectionHeading
-          eyebrow={content.benefits.eyebrow}
-          title={content.benefits.section_title}
-          subtitle={content.benefits.section_subtitle}
-        />
+        <SectionHeading eyebrow={eyebrow} title={title} subtitle={subtitle} />
 
         <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {content.benefits.cards.map((card) => (
+          {cards.map((card) => (
             <Card key={card.id} as="li">
               <div className="flex flex-col gap-4">
                 <span className="inline-flex h-12 w-12 items-center justify-center rounded-brand-lg bg-gradient-cta text-white shadow-signature">

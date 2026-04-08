@@ -4,13 +4,13 @@ import { useEffect } from 'react';
 import { trackEvent, EVENTS } from '@/lib/analytics';
 
 /**
- * Fires the view_landing event exactly once per session (handled by analytics).
- * Mounted inside the landing page only.
+ * Fires the view_company_home event once per session.
+ * Mounted at the top of the corporate home page only.
  */
-export function LandingViewTracker() {
+export function CompanyViewTracker() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    trackEvent(EVENTS.VIEW_LANDING, {
+    trackEvent(EVENTS.VIEW_COMPANY_HOME, {
       referrer: document.referrer || null,
       utm_source: params.get('utm_source'),
       utm_medium: params.get('utm_medium'),

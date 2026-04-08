@@ -1,31 +1,21 @@
 import { Container } from '@/components/ui/Container';
 import { SectionHeading } from '@/components/ui/SectionHeading';
+import { companyContent } from '@/lib/content';
 
-type Step = {
-  number: number;
-  title: string;
-  description: string;
-  hint?: string;
-};
-
-type Props = {
-  eyebrow: string;
-  title: string;
-  subtitle?: string;
-  steps: readonly Step[];
-  sectionId?: string;
-};
-
-export function HowItWorksSection({ eyebrow, title, subtitle, steps, sectionId = 'how' }: Props) {
+export function CompanyProcessSection() {
   return (
-    <section id={sectionId} className="section bg-white">
+    <section id="process" className="section bg-white">
       <Container>
-        <SectionHeading eyebrow={eyebrow} title={title} subtitle={subtitle} />
+        <SectionHeading
+          eyebrow={companyContent.process.eyebrow}
+          title={companyContent.process.section_title}
+          subtitle={companyContent.process.section_subtitle}
+        />
 
         <ol className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {steps.map((step) => (
+          {companyContent.process.steps.map((step) => (
             <li key={step.number} className="card p-6 flex flex-col gap-3 relative">
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-brand-md bg-primary text-white font-display font-bold">
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-brand-md bg-gradient-cta text-white font-display font-bold shadow-signature">
                 {step.number}
               </span>
               <h3 className="text-lg font-bold text-brand-text">{step.title}</h3>

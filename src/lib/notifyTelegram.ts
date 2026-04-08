@@ -60,15 +60,19 @@ function escapeHtml(raw: string): string {
 }
 
 function buildMessageText(lead: Lead): string {
+  const businessType = lead.businessType ? escapeHtml(lead.businessType) : '—';
+  const numUsers = lead.numUsers ? escapeHtml(lead.numUsers) : '—';
   const lines = [
-    '🟢 <b>Nuevo lead · ROHU Contable</b>',
+    '🟢 <b>Nuevo lead · ROHU Solutions</b>',
+    '',
+    `🧩 Aplicación: <b>${escapeHtml(lead.application)}</b>`,
     '',
     `👤 <b>${escapeHtml(lead.firstName)}</b>`,
     `🏢 ${escapeHtml(lead.companyName)}${lead.nit ? ` · NIT ${escapeHtml(lead.nit)}` : ''}`,
     `📍 ${escapeHtml(lead.city)}`,
     `✉️ ${escapeHtml(lead.email)}`,
     `📱 ${escapeHtml(lead.whatsapp)}`,
-    `💼 ${escapeHtml(lead.businessType)} · ${escapeHtml(lead.numUsers)} usuarios`,
+    `💼 ${businessType} · ${numUsers} usuarios`,
   ];
   if (lead.planInterest) {
     lines.push(`💎 Plan: <b>${escapeHtml(lead.planInterest)}</b>`);

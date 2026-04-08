@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { leadFormSchema } from '@/components/forms/leadFormSchema';
 import { appendLead } from '@/lib/leadsStore';
 import { notifyTelegram } from '@/lib/notifyTelegram';
+import { sendLeadEmail } from '@/lib/sendLeadEmail';
 import type { Lead } from '@/types/lead';
 
 export const runtime = 'nodejs';
@@ -81,6 +82,7 @@ export async function POST(req: NextRequest) {
     numUsers: parsed.data.numUsers,
     message: parsed.data.message,
     planInterest: parsed.data.planInterest,
+    application: parsed.data.application,
     habeasData: true,
     source: 'rohu-marketing-web',
   };
@@ -95,6 +97,9 @@ export async function POST(req: NextRequest) {
 
   // Fire-and-forget: notify the owner on Telegram
   void notifyTelegram(lead);
+
+  // Fire-and-forget: send email notification to the owner
+  void sendLeadEmail(lead);
 
   // Optional: forward to an external CRM webhook
   const crmUrl = process.env.LEAD_API_URL;

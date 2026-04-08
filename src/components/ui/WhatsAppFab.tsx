@@ -3,7 +3,7 @@
 import { MessageCircle } from 'lucide-react';
 import { trackEvent, EVENTS } from '@/lib/analytics';
 import { buildWhatsAppUrl, getWhatsAppConfig } from '@/lib/contactChannels';
-import { content } from '@/lib/content';
+import { commonContent } from '@/lib/content';
 
 /**
  * Floating WhatsApp action button — always visible on the bottom-right
@@ -21,7 +21,7 @@ export function WhatsAppFab() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chatear con nosotros por WhatsApp"
-      title={content.legal.external_link_tooltip}
+      title={commonContent.legal.external_link_tooltip}
       onClick={() => trackEvent(EVENTS.CLICK_WHATSAPP_FAB, { cta_location: 'fab' })}
       className="
         fixed bottom-5 right-5 z-40

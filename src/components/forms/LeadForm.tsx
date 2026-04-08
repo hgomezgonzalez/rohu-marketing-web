@@ -1,6 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
+import type {
+  InputHTMLAttributes,
+  SelectHTMLAttributes,
+  TextareaHTMLAttributes,
+} from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useForm, type SubmitHandler } from 'react-hook-form';
@@ -12,19 +17,27 @@ import {
   numUsersOptions,
   type LeadFormValues,
 } from './leadFormSchema';
-import { content } from '@/lib/content';
+import { commonContent } from '@/lib/content';
+import { buildApplicationOptions, GENERAL_ADVISORY_OPTION } from '@/lib/applications';
 import { trackEvent, EVENTS } from '@/lib/analytics';
 import { buildWhatsAppUrl, getWhatsAppConfig } from '@/lib/contactChannels';
 import { cn } from '@/lib/cn';
 
 type SubmitState = 'idle' | 'loading' | 'error';
 
-export function LeadForm() {
+type Props = {
+  /** Slug of the application to pre-select in the "Aplicación de interés" field */
+  preselectedApp?: string;
+};
+
+export function LeadForm({ preselectedApp }: Props = {}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [submitState, setSubmitState] = useState<SubmitState>('idle');
   const { phone, defaultMessage } = getWhatsAppConfig();
   const waHref = phone ? buildWhatsAppUrl(phone, defaultMessage) : null;
+  const applicationOptions = buildApplicationOptions();
+  const defaultApplication = preselectedApp ?? GENERAL_ADVISORY_OPTION;
 
   const {
     register,
@@ -33,7 +46,19 @@ export function LeadForm() {
     formState: { errors, isSubmitting },
   } = useForm<LeadFormValues>({
     resolver: zodResolver(leadFormSchema),
+    mode: 'onBlur',
     defaultValues: {
+      application: defaultApplication,
+      firstName: '',
+      companyName: '',
+      nit: '',
+      city: '',
+      email: '',
+      whatsapp: '',
+      businessType: undefined,
+      numUsers: undefined,
+      message: '',
+      planInterest: '',
       habeasData: false as unknown as true,
       website: '',
     },
@@ -49,7 +74,10 @@ export function LeadForm() {
 
   const onSubmit: SubmitHandler<LeadFormValues> = async (data) => {
     setSubmitState('loading');
-    trackEvent(EVENTS.SUBMIT_LEAD, { plan_interest: data.planInterest ?? null });
+    trackEvent(EVENTS.SUBMIT_LEAD, {
+      application_id: data.application,
+      plan_interest: data.planInterest ?? null,
+    });
     try {
       const res = await fetch('/api/leads', {
         method: 'POST',
@@ -57,7 +85,10 @@ export function LeadForm() {
         body: JSON.stringify(data),
       });
       if (!res.ok) throw new Error(`Request failed: ${res.status}`);
-      trackEvent(EVENTS.SUBMIT_LEAD_SUCCESS, { plan_interest: data.planInterest ?? null });
+      trackEvent(EVENTS.SUBMIT_LEAD_SUCCESS, {
+        application_id: data.application,
+        plan_interest: data.planInterest ?? null,
+      });
       router.push('/gracias');
     } catch (err) {
       trackEvent(EVENTS.SUBMIT_LEAD_ERROR, {
@@ -80,9 +111,9 @@ export function LeadForm() {
             <AlertCircle size={20} strokeWidth={2} className="text-danger flex-shrink-0 mt-0.5" />
             <div>
               <p className="font-semibold text-danger">
-                {content.cta_final.error_banner.title}
+                {commonContent.leadForm.error_banner.title}
               </p>
-              <p className="text-sm text-danger/80 mt-1">{content.cta_final.error_banner.body}</p>
+              <p className="text-sm text-danger/80 mt-1">{commonContent.leadForm.error_banner.body}</p>
             </div>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -91,7 +122,7 @@ export function LeadForm() {
               className="btn-secondary px-4 py-2 text-sm"
               onClick={() => setSubmitState('idle')}
             >
-              {content.cta_final.error_banner.retry_label}
+              {commonContent.leadForm.error_banner.retry_label}
             </button>
             {waHref && (
               <a
@@ -101,12 +132,21 @@ export function LeadForm() {
                 className="btn-ghost px-4 py-2 text-sm"
               >
                 <MessageCircle size={16} strokeWidth={2} />
-                {content.cta_final.error_banner.whatsapp_label}
+                {commonContent.leadForm.error_banner.whatsapp_label}
               </a>
             )}
           </div>
         </div>
       )}
+
+      <SelectField
+        label={commonContent.leadForm.application_label}
+        helper={commonContent.leadForm.application_helper}
+        error={errors.application?.message}
+        required
+        options={applicationOptions}
+        {...register('application')}
+      />
 
       <div className="grid gap-5 sm:grid-cols-2">
         <Field
@@ -196,11 +236,11 @@ export function LeadForm() {
           {...register('habeasData')}
         />
         <span>
-          {content.legal.habeas_data_checkbox.split('Política de Privacidad')[0]}
+          {commonContent.legal.habeas_data_checkbox.split('Política de Privacidad')[0]}
           <Link href="/privacidad" className="text-primary underline underline-offset-2">
             Política de Privacidad
           </Link>
-          {content.legal.habeas_data_checkbox.split('Política de Privacidad')[1]}
+          {commonContent.legal.habeas_data_checkbox.split('Política de Privacidad')[1]}
         </span>
       </label>
       {errors.habeasData && (
@@ -215,12 +255,12 @@ export function LeadForm() {
         {isSubmitting || submitState === 'loading' ? (
           <>
             <Loader2 size={18} strokeWidth={2} className="animate-spin" />
-            {content.cta_final.submit_loading}
+            {commonContent.leadForm.submit_loading}
           </>
         ) : (
           <>
             <CheckCircle2 size={18} strokeWidth={2} />
-            {content.cta_final.submit_label}
+            {commonContent.leadForm.submit_label}
           </>
         )}
       </button>
@@ -235,14 +275,20 @@ type FieldBaseProps = {
   required?: boolean;
 };
 
-const Field = ({
-  label,
-  error,
-  helper,
-  required,
-  className,
-  ...rest
-}: FieldBaseProps & React.InputHTMLAttributes<HTMLInputElement>) => {
+/**
+ * IMPORTANT: these three field components MUST use forwardRef.
+ * `register()` from react-hook-form returns a `ref` callback that must land on
+ * the actual DOM element. React does not propagate `ref` as a normal prop in
+ * function components — forwardRef is required. Without it, react-hook-form
+ * never captures values → every field fires `required_error` on submit.
+ */
+
+type InputFieldProps = FieldBaseProps & InputHTMLAttributes<HTMLInputElement>;
+
+const Field = forwardRef<HTMLInputElement, InputFieldProps>(function Field(
+  { label, error, helper, required, className, ...rest },
+  ref
+) {
   const id = rest.id ?? rest.name;
   return (
     <div className="flex flex-col gap-1.5">
@@ -250,6 +296,7 @@ const Field = ({
         {label} {required && <span className="text-danger">*</span>}
       </label>
       <input
+        ref={ref}
         id={id}
         aria-invalid={!!error}
         aria-describedby={error ? `${id}-error` : helper ? `${id}-helper` : undefined}
@@ -274,18 +321,17 @@ const Field = ({
       )}
     </div>
   );
-};
+});
 
-const SelectField = ({
-  label,
-  error,
-  required,
-  options,
-  className,
-  ...rest
-}: FieldBaseProps & {
-  options: readonly string[];
-} & React.SelectHTMLAttributes<HTMLSelectElement>) => {
+type SelectFieldProps = FieldBaseProps &
+  SelectHTMLAttributes<HTMLSelectElement> & {
+    options: readonly string[] | ReadonlyArray<{ value: string; label: string }>;
+  };
+
+const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(function SelectField(
+  { label, error, helper, required, options, className, ...rest },
+  ref
+) {
   const id = rest.id ?? rest.name;
   return (
     <div className="flex flex-col gap-1.5">
@@ -293,10 +339,10 @@ const SelectField = ({
         {label} {required && <span className="text-danger">*</span>}
       </label>
       <select
+        ref={ref}
         id={id}
         aria-invalid={!!error}
-        aria-describedby={error ? `${id}-error` : undefined}
-        defaultValue=""
+        aria-describedby={error ? `${id}-error` : helper ? `${id}-helper` : undefined}
         className={cn(
           'rounded-brand-md border border-brand-border bg-white px-4 py-3 text-brand-text',
           'focus:border-primary focus:outline-none focus:ring-2 focus:ring-accent/40',
@@ -308,12 +354,26 @@ const SelectField = ({
         <option value="" disabled>
           Selecciona una opción
         </option>
-        {options.map((opt) => (
-          <option key={opt} value={opt}>
-            {opt}
-          </option>
-        ))}
+        {options.map((opt) => {
+          if (typeof opt === 'string') {
+            return (
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
+            );
+          }
+          return (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          );
+        })}
       </select>
+      {helper && !error && (
+        <p id={`${id}-helper`} className="text-xs text-brand-muted">
+          {helper}
+        </p>
+      )}
       {error && (
         <p id={`${id}-error`} className="text-xs text-danger">
           {error}
@@ -321,15 +381,14 @@ const SelectField = ({
       )}
     </div>
   );
-};
+});
 
-const TextareaField = ({
-  label,
-  error,
-  helper,
-  className,
-  ...rest
-}: FieldBaseProps & React.TextareaHTMLAttributes<HTMLTextAreaElement>) => {
+type TextareaFieldProps = FieldBaseProps & TextareaHTMLAttributes<HTMLTextAreaElement>;
+
+const TextareaField = forwardRef<HTMLTextAreaElement, TextareaFieldProps>(function TextareaField(
+  { label, error, helper, className, ...rest },
+  ref
+) {
   const id = rest.id ?? rest.name;
   return (
     <div className="flex flex-col gap-1.5">
@@ -337,6 +396,7 @@ const TextareaField = ({
         {label}
       </label>
       <textarea
+        ref={ref}
         id={id}
         rows={4}
         aria-invalid={!!error}
@@ -353,4 +413,4 @@ const TextareaField = ({
       {error && <p className="text-xs text-danger">{error}</p>}
     </div>
   );
-};
+});
