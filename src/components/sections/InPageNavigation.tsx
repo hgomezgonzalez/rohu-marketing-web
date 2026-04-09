@@ -53,7 +53,39 @@ type Props = {
  */
 export function InPageNavigation({ items, applicationId }: Props) {
   const [activeId, setActiveId] = useState<string | null>(items[0]?.id ?? null);
+  const [isVisible, setIsVisible] = useState(false);
   const listRef = useRef<HTMLUListElement | null>(null);
+
+  // Reveal: the nav appears only once the user has scrolled past the hero
+  // section (UX call from the funnel-designer agent). Once visible, it stays
+  // visible — we never hide it again to avoid flicker when the user scrolls
+  // back up.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const hero = document.querySelector<HTMLElement>(
+      '[data-inpage-nav-sentinel="hero"]'
+    );
+    if (!hero) {
+      // No hero sentinel found → fall back to always visible.
+      setIsVisible(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (!entry) return;
+        // When the hero has scrolled out of view, reveal the nav.
+        if (!entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0 }
+    );
+    observer.observe(hero);
+    return () => observer.disconnect();
+  }, []);
 
   // Scroll spy: detect the section closest to the top of the viewport
   useEffect(() => {
@@ -124,7 +156,14 @@ export function InPageNavigation({ items, applicationId }: Props) {
   return (
     <nav
       aria-label="Navegación interna de la página"
-      className="sticky top-16 sm:top-18 z-20 bg-brand-bg/90 backdrop-blur-md border-b border-brand-border"
+      aria-hidden={!isVisible}
+      className={cn(
+        'sticky top-16 sm:top-18 z-20 bg-brand-bg/90 backdrop-blur-md border-b border-brand-border',
+        'transition-all duration-200 ease-out',
+        isVisible
+          ? 'opacity-100 translate-y-0 pointer-events-auto'
+          : 'opacity-0 -translate-y-2 pointer-events-none h-0 overflow-hidden'
+      )}
     >
       {/* Mobile scroll hint: subtle right-edge fade */}
       <div className="relative">

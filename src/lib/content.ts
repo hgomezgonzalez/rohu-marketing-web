@@ -297,16 +297,13 @@ export const FEATURE_FLAGS = {
 } as const;
 
 /**
- * Copy shown by SocialProofSection while TESTIMONIALS_PUBLISHED is false.
- * Separated so legal/brand can review it independently.
+ * Minimalist copy shown by SocialProofSection while TESTIMONIALS_PUBLISHED is
+ * false. Intentionally short and without a CTA — the funnel-designer agent
+ * flagged that a secondary CTA here would compete with the final contact form
+ * which sits one section below. Low visual surface, zero fake content.
  */
 export const pendingTestimonialsCopy = {
   eyebrow: 'Testimonios',
-  title: 'Estamos recopilando testimonios reales',
-  body:
-    'Publicaremos próximamente las experiencias de nuestros clientes, siempre con su autorización expresa conforme a la Ley 1581 de 2012. Mientras tanto, puedes conocer más sobre ROHU Solutions escribiéndonos directamente.',
-  note:
-    'Todos los testimonios se publicarán con el consentimiento informado del cliente.',
-  cta_label: 'Habla con un asesor',
-  cta_href: '#contact',
+  title: 'Estamos recopilando casos reales',
+  body: 'Pronto publicaremos aquí experiencias de clientes con su autorización expresa, conforme a la Ley 1581 de 2012.',
 } as const;

@@ -1,5 +1,4 @@
-import Link from 'next/link';
-import { MessageSquareText, Quote, ShieldCheck } from 'lucide-react';
+import { MessageSquareText, Quote } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { pendingTestimonialsCopy } from '@/lib/content';
@@ -88,47 +87,28 @@ export function SocialProofSection({
 
 /**
  * Renders a sober, legal-safe placeholder while real testimonials are being
- * collected and authorized. No fake content, no fake avatars.
+ * collected and authorized. No CTA (the funnel-designer flagged that a second
+ * "habla con un asesor" here would compete with the form one section below),
+ * no fake avatars, no skeleton loaders — minimal visual surface.
  */
 function PendingTestimonialsBlock() {
   return (
     <section id="testimonials" className="section">
       <Container>
-        <div className="mx-auto max-w-2xl">
-          <div className="card relative overflow-hidden p-8 sm:p-12 text-center">
-            <div
-              aria-hidden="true"
-              className="absolute inset-x-0 top-0 h-1 bg-gradient-cta"
-            />
+        <div className="mx-auto max-w-xl text-center">
+          <span className="inline-flex h-12 w-12 items-center justify-center rounded-brand-lg bg-accent/10 text-accent">
+            <MessageSquareText size={22} strokeWidth={1.75} aria-hidden="true" />
+          </span>
 
-            <span className="inline-flex h-16 w-16 items-center justify-center rounded-brand-xl bg-accent/10 text-accent">
-              <MessageSquareText size={32} strokeWidth={1.75} aria-hidden="true" />
-            </span>
+          <span className="eyebrow mt-4 inline-flex">{pendingTestimonialsCopy.eyebrow}</span>
 
-            <span className="eyebrow mt-5 inline-flex">{pendingTestimonialsCopy.eyebrow}</span>
+          <h2 className="mt-3 text-xl sm:text-2xl font-bold text-brand-text">
+            {pendingTestimonialsCopy.title}
+          </h2>
 
-            <h2 className="mt-4 text-2xl sm:text-3xl font-extrabold text-brand-text">
-              {pendingTestimonialsCopy.title}
-            </h2>
-
-            <p className="mt-4 text-brand-muted leading-relaxed max-w-lg mx-auto">
-              {pendingTestimonialsCopy.body}
-            </p>
-
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link
-                href={pendingTestimonialsCopy.cta_href}
-                className="btn-secondary px-6 py-3"
-              >
-                {pendingTestimonialsCopy.cta_label}
-              </Link>
-            </div>
-
-            <div className="mt-6 inline-flex items-center gap-2 text-xs text-brand-muted">
-              <ShieldCheck size={14} strokeWidth={2} className="text-secondary" />
-              <span>{pendingTestimonialsCopy.note}</span>
-            </div>
-          </div>
+          <p className="mt-3 text-sm text-brand-muted leading-relaxed max-w-md mx-auto">
+            {pendingTestimonialsCopy.body}
+          </p>
         </div>
       </Container>
     </section>

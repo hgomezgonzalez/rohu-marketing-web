@@ -17,7 +17,11 @@ export function ApplicationHeroSection({ app }: Props) {
   const waHref = phone ? buildWhatsAppUrl(phone, defaultMessage) : null;
 
   return (
-    <section className="relative overflow-hidden bg-gradient-hero text-white">
+    <section
+      id="app-hero"
+      data-inpage-nav-sentinel="hero"
+      className="relative overflow-hidden bg-gradient-hero text-white"
+    >
       <div className="absolute inset-0 pointer-events-none opacity-20 [background-image:radial-gradient(circle_at_20%_10%,rgba(255,255,255,0.4),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(6,182,212,0.5),transparent_45%)]" />
 
       <Container as="div" className="relative py-16 sm:py-20 md:py-24">
