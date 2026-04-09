@@ -1,0 +1,42 @@
+name: Deploy to Heroku
+
+# Every push to main triggers this workflow, which mirrors the commit to
+# Heroku's git remote. Requires one secret in GitHub:
+#   HEROKU_API_KEY  — obtained from `heroku auth:token` on the owner's machine
+#                     (or from https://dashboard.heroku.com/account).
+#
+# The Heroku build (buildpack heroku/nodejs) runs on Heroku's side, so this
+# workflow stays minimal: checkout full history, then push the ref.
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: heroku-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to Heroku
+    runs-on: ubuntu-latest
+    env:
+      HEROKU_APP_NAME: rohu-marketing-web
+    steps:
+      - name: Checkout repository (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push to Heroku
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |
+          if [ -z "$HEROKU_API_KEY" ]; then
+            echo "::error::HEROKU_API_KEY secret is not set. Add it in"
+            echo "::error::GitHub → Settings → Secrets and variables → Actions → New repository secret."
+            exit 1
+          fi
+          git push --force "https://heroku:${HEROKU_API_KEY}@git.heroku.com/${HEROKU_APP_NAME}.git" HEAD:main

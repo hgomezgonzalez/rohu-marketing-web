@@ -243,35 +243,24 @@ Opcional pero muy recomendado. Permite recibir notificaciones push instantáneas
 
 ---
 
-## Despliegue GitHub → Heroku
+## Despliegue GitHub → Heroku (automatizado)
 
-**Principio:** GitHub es fuente de verdad. Heroku se suscribe al repo y despliega automáticamente en cada push a `main`. **Nunca se usa `git push heroku main`.**
+**Estado actual:** la app ya está publicada y con auto-deploy.
 
-### 1. Publicar el scaffold a GitHub
+- **URL de producción:** https://rohu-marketing-web-06a37233de1e.herokuapp.com
+- **App Heroku:** `rohu-marketing-web`
+- **Repo fuente:** https://github.com/hgomezgonzalez/rohu-marketing-web
+- **Flujo:** cada `git push origin main` dispara el workflow `.github/workflows/deploy-heroku.yml` que empuja el código a Heroku, donde el buildpack `heroku/nodejs` corre `next build` y publica una nueva release.
 
-```bash
-cd rohu-marketing-web
-git status                                 # verifica qué va a commitearse
-git diff --staged                          # revisa que NO haya .env.local ni secretos
-git add .
-git commit -m "feat: rebrand to rohu solutions with multi-app registry"
-
-# Opción A — con gh CLI (recomendada)
-gh repo create rohu-marketing-web --public --source=. --remote=origin --push
-
-# Opción B — manual
-# 1. Crear repo vacío en github.com/<user>/rohu-marketing-web
-# 2. git remote add origin git@github.com:<user>/rohu-marketing-web.git
-# 3. git push -u origin main
-```
-
-### 2. Crear la app en Heroku
+### Setup inicial (hecho una sola vez)
 
 ```bash
-heroku create rohu-marketing-web
+# 1. Crear la app
+heroku create rohu-marketing-web --region us
 
-heroku config:set \
-  NEXT_PUBLIC_SITE_URL=https://rohu-marketing-web.herokuapp.com \
+# 2. Config vars (ver .env.example para la lista completa)
+heroku config:set -a rohu-marketing-web \
+  NEXT_PUBLIC_SITE_URL=https://rohu-marketing-web-06a37233de1e.herokuapp.com \
   NEXT_PUBLIC_DEMO_URL=https://rohu-contable-prod-3fba93dd2eb4.herokuapp.com/ \
   NEXT_PUBLIC_DEMO_USER=demo@rohu-contable.com \
   NEXT_PUBLIC_DEMO_PASSWORD=demo1234 \
@@ -281,29 +270,45 @@ heroku config:set \
   SMTP_PORT=587 \
   SMTP_SECURE=false \
   SMTP_USER=hgomezgonzalez@gmail.com \
-  SMTP_PASS="tu-app-password-de-gmail" \
+  "SMTP_PASS=tu-app-password-de-gmail" \
   "SMTP_FROM=ROHU Solutions <hgomezgonzalez@gmail.com>" \
   SMTP_TO=hgomezgonzalez@gmail.com \
   NPM_CONFIG_PRODUCTION=false
+
+# 3. Primer deploy manual
+heroku git:remote -a rohu-marketing-web
+git push heroku main
 ```
 
-### 3. Conectar Heroku al repo (UI, una sola vez)
+### Auto-deploy desde GitHub (GitHub Actions)
 
-1. Heroku Dashboard → tu app → **Deploy**.
-2. **Deployment method** → **GitHub** → **Connect to GitHub** → autoriza.
-3. Busca `rohu-marketing-web` → **Connect**.
-4. **Automatic deploys** → rama `main` → **Enable Automatic Deploys**.
-5. **Manual deploy** → **Deploy Branch** (primer deploy).
+El archivo `.github/workflows/deploy-heroku.yml` se encarga del pipeline. Solo requiere **un secret** en GitHub, una sola vez:
 
-### 4. Flujo diario
+1. Obtén tu token: `heroku auth:token` (o desde https://dashboard.heroku.com/account).
+2. GitHub → repo `rohu-marketing-web` → **Settings → Secrets and variables → Actions → New repository secret**.
+3. Nombre: `HEROKU_API_KEY`. Valor: el token.
+4. Listo. En el próximo `git push origin main`, verás el workflow corriendo en la pestaña **Actions**.
+
+Puedes disparar un deploy manual desde GitHub → **Actions → Deploy to Heroku → Run workflow**.
+
+### Flujo diario
 
 ```bash
-git checkout -b feat/new-app
-# agrega una entrada en src/lib/applications.ts con status: 'live'
+git checkout -b feat/new-change
+# editar código...
 npm run build                              # verifica localmente
-git commit -am "feat(applications): add rohu-restaurantes"
-git push origin feat/new-app
-# abrir PR → mergear a main → Heroku despliega solo.
+git commit -am "feat: descripción corta"
+git push origin feat/new-change
+# abrir PR → mergear a main → Heroku despliega solo en ~1-2 min.
+```
+
+### Debug de producción
+
+```bash
+heroku logs -a rohu-marketing-web --tail       # ver logs en vivo
+heroku ps -a rohu-marketing-web                # estado del dyno
+heroku releases -a rohu-marketing-web          # historial de releases
+heroku rollback -a rohu-marketing-web          # volver al release anterior
 ```
 
 ### Despliegue alternativo: Vercel
