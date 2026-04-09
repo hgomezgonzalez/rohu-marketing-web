@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import {
-  ArrowDownCircle,
   ClipboardList,
   HelpCircle,
   Layers,
@@ -55,6 +54,11 @@ export function InPageNavigation({ items, applicationId }: Props) {
   const [activeId, setActiveId] = useState<string | null>(items[0]?.id ?? null);
   const [isVisible, setIsVisible] = useState(false);
   const listRef = useRef<HTMLUListElement | null>(null);
+  // Debounce scroll-triggered analytics so we don't spam the dataLayer on every
+  // intersection callback. Only fire once per 300ms and only when the active
+  // section actually changes. Recommendation from the analytics-tracking agent.
+  const lastTrackedIdRef = useRef<string | null>(null);
+  const scrollDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Reveal: the nav appears only once the user has scrolled past the hero
   // section (UX call from the funnel-designer agent). Once visible, it stays
@@ -107,8 +111,25 @@ export function InPageNavigation({ items, applicationId }: Props) {
             if (aRatio !== bRatio) return bRatio - aRatio;
             return a.boundingClientRect.top - b.boundingClientRect.top;
           });
-        if (visible[0]) {
-          setActiveId(visible[0].target.id);
+        const next = visible[0]?.target.id;
+        if (next && next !== activeId) {
+          setActiveId(next);
+
+          // Debounced scroll tracking: only fire once the user actually settles
+          // on a new section. Avoids spamming the dataLayer during fast scrolls.
+          if (scrollDebounceRef.current) clearTimeout(scrollDebounceRef.current);
+          scrollDebounceRef.current = setTimeout(() => {
+            if (next === lastTrackedIdRef.current) return;
+            const label = items.find((i) => i.id === next)?.label ?? next;
+            trackEvent(EVENTS.CLICK_INPAGE_NAV, {
+              section_id: next,
+              section_label: label,
+              application_id: applicationId ?? null,
+              trigger: 'scroll',
+              from_section_id: lastTrackedIdRef.current ?? null,
+            });
+            lastTrackedIdRef.current = next;
+          }, 300);
         }
       },
       {
@@ -119,8 +140,11 @@ export function InPageNavigation({ items, applicationId }: Props) {
     );
 
     sections.forEach((section) => observer.observe(section));
-    return () => observer.disconnect();
-  }, [items]);
+    return () => {
+      observer.disconnect();
+      if (scrollDebounceRef.current) clearTimeout(scrollDebounceRef.current);
+    };
+  }, [items, activeId, applicationId]);
 
   // When the active item changes on mobile, scroll it into view in the nav bar
   useEffect(() => {
@@ -144,7 +168,9 @@ export function InPageNavigation({ items, applicationId }: Props) {
         section_label: item.label,
         application_id: applicationId ?? null,
         trigger: 'click',
+        from_section_id: lastTrackedIdRef.current ?? null,
       });
+      lastTrackedIdRef.current = item.id;
       const target = document.getElementById(item.id);
       if (target) {
         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -165,22 +191,32 @@ export function InPageNavigation({ items, applicationId }: Props) {
           : 'opacity-0 -translate-y-2 pointer-events-none h-0 overflow-hidden'
       )}
     >
-      {/* Mobile scroll hint: subtle right-edge fade */}
-      <div className="relative">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-brand-bg/90 to-transparent md:hidden"
-        />
+      {/* Wrapper: relative to host the mobile scroll hint pseudo-element */}
+      <div
+        className={cn(
+          'relative',
+          // Mobile-only right-edge fade hint ("hay más →")
+          'after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-10',
+          'after:bg-gradient-to-l after:from-brand-bg after:to-transparent md:after:hidden'
+        )}
+      >
         <ul
           ref={listRef}
           role="tablist"
-          className="flex flex-row items-center gap-1 overflow-x-auto overflow-y-hidden scroll-smooth px-4 sm:px-6 h-14 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden md:justify-center md:gap-2 snap-x snap-mandatory md:snap-none"
+          className={cn(
+            'flex flex-row items-center gap-1 h-12',
+            'overflow-x-auto overflow-y-hidden scroll-smooth',
+            'snap-x snap-mandatory md:snap-none',
+            'px-4 sm:px-6 md:justify-center md:gap-2 md:max-w-5xl md:mx-auto',
+            // Hide native scrollbar across browsers
+            '[scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'
+          )}
         >
           {items.map((item) => {
             const Icon = item.icon;
             const isActive = activeId === item.id;
             return (
-              <li key={item.id} className="snap-start flex-shrink-0">
+              <li key={item.id} className="snap-start flex-shrink-0 h-full flex items-stretch">
                 <button
                   type="button"
                   role="tab"
@@ -189,11 +225,13 @@ export function InPageNavigation({ items, applicationId }: Props) {
                   data-nav-item={item.id}
                   onClick={() => handleClick(item)}
                   className={cn(
-                    'group inline-flex items-center gap-2 whitespace-nowrap rounded-brand-md px-3 py-2 text-sm font-semibold transition-all duration-150',
-                    'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-brand-bg',
+                    'inline-flex items-center gap-2 whitespace-nowrap px-3 text-sm font-semibold transition-colors duration-150',
+                    // Active state: underline + tinted bg (brand-designer spec)
+                    'border-b-2',
+                    'focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-brand-bg',
                     isActive
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-brand-muted hover:bg-primary/5 hover:text-primary'
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-transparent text-brand-muted hover:text-primary hover:bg-primary/5'
                   )}
                 >
                   {Icon && (
@@ -205,12 +243,6 @@ export function InPageNavigation({ items, applicationId }: Props) {
                     />
                   )}
                   <span>{item.label}</span>
-                  {isActive && (
-                    <span
-                      aria-hidden="true"
-                      className="ml-0.5 inline-flex h-1.5 w-1.5 rounded-full bg-accent"
-                    />
-                  )}
                 </button>
               </li>
             );
@@ -221,5 +253,3 @@ export function InPageNavigation({ items, applicationId }: Props) {
   );
 }
 
-/** Exported for the "scroll to first section" button fallback, unused by default. */
-export { ArrowDownCircle };

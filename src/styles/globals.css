@@ -18,12 +18,12 @@
 
   /*
    * Compensate for the double sticky header (main header ~64-72px + in-page
-   * navigation ~56px) when smooth-scrolling to anchored sections.
+   * navigation ~48px) when smooth-scrolling to anchored sections.
    * Applies globally to any <section id="..."> target, so anchor links from
    * the main header and the in-page nav always land with breathing room.
    */
   section[id] {
-    scroll-margin-top: 140px;
+    scroll-margin-top: 128px;
   }
 
   h1,
