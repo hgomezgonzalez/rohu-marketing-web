@@ -301,9 +301,14 @@ export const FEATURE_FLAGS = {
  * false. Intentionally short and without a CTA — the funnel-designer agent
  * flagged that a secondary CTA here would compete with the final contact form
  * which sits one section below. Low visual surface, zero fake content.
+ *
+ * Wording approved by the legal-compliance agent: "autorización escrita,
+ * previa e informada" is the exact phrasing required by Art. 9 of Ley
+ * 1581/2012 (Habeas Data) — the previous "autorización expresa" was
+ * insufficient because it did not specify channel or form of consent.
  */
 export const pendingTestimonialsCopy = {
   eyebrow: 'Testimonios',
   title: 'Estamos recopilando casos reales',
-  body: 'Pronto publicaremos aquí experiencias de clientes con su autorización expresa, conforme a la Ley 1581 de 2012.',
+  body: 'Publicaremos aquí experiencias de clientes únicamente con autorización escrita, previa e informada de cada titular, conforme a la Ley 1581 de 2012.',
 } as const;

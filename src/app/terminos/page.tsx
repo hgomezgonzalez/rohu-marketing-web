@@ -30,6 +30,12 @@ export default function TermsPage() {
               <strong>No presenta declaraciones tributarias ante la DIAN</strong> ni reemplaza la
               labor de un contador público titulado.
             </p>
+            <p className="mt-3 text-brand-muted">
+              <strong>Alcance geográfico:</strong> el servicio se rige exclusivamente por la
+              legislación colombiana. ROHU no garantiza adecuación a marcos normativos,
+              tributarios ni contables de jurisdicciones distintas a Colombia, y el usuario es
+              responsable de validar su cumplimiento local con asesores en su respectivo país.
+            </p>
           </section>
 
           <section>
