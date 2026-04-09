@@ -1,11 +1,6 @@
 'use client';
 
-import { forwardRef, useEffect, useState } from 'react';
-import type {
-  InputHTMLAttributes,
-  SelectHTMLAttributes,
-  TextareaHTMLAttributes,
-} from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useForm, type SubmitHandler } from 'react-hook-form';
@@ -17,6 +12,7 @@ import {
   numUsersOptions,
   type LeadFormValues,
 } from './leadFormSchema';
+import { Field, SelectField, TextareaField } from './FormPrimitives';
 import { commonContent } from '@/lib/content';
 import { buildApplicationOptions, GENERAL_ADVISORY_OPTION } from '@/lib/applications';
 import { trackEvent, EVENTS } from '@/lib/analytics';
@@ -64,7 +60,9 @@ export function LeadForm({ preselectedApp }: Props = {}) {
     },
   });
 
-  // Pre-select plan from URL hash (e.g. #contact?plan=pro)
+  // Pre-select plan from URL query string (e.g. ?plan=pro#contact).
+  // This is set by the QuickQuoteModal "open full form" fallback via
+  // router.push, and works as a real Next.js search param.
   useEffect(() => {
     const plan = searchParams?.get('plan');
     if (plan) {
@@ -267,150 +265,3 @@ export function LeadForm({ preselectedApp }: Props = {}) {
     </form>
   );
 }
-
-type FieldBaseProps = {
-  label: string;
-  error?: string;
-  helper?: string;
-  required?: boolean;
-};
-
-/**
- * IMPORTANT: these three field components MUST use forwardRef.
- * `register()` from react-hook-form returns a `ref` callback that must land on
- * the actual DOM element. React does not propagate `ref` as a normal prop in
- * function components — forwardRef is required. Without it, react-hook-form
- * never captures values → every field fires `required_error` on submit.
- */
-
-type InputFieldProps = FieldBaseProps & InputHTMLAttributes<HTMLInputElement>;
-
-const Field = forwardRef<HTMLInputElement, InputFieldProps>(function Field(
-  { label, error, helper, required, className, ...rest },
-  ref
-) {
-  const id = rest.id ?? rest.name;
-  return (
-    <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-sm font-semibold text-brand-text">
-        {label} {required && <span className="text-danger">*</span>}
-      </label>
-      <input
-        ref={ref}
-        id={id}
-        aria-invalid={!!error}
-        aria-describedby={error ? `${id}-error` : helper ? `${id}-helper` : undefined}
-        className={cn(
-          'rounded-brand-md border border-brand-border bg-white px-4 py-3 text-brand-text',
-          'placeholder:text-brand-muted/70',
-          'focus:border-primary focus:outline-none focus:ring-2 focus:ring-accent/40',
-          error && 'border-danger focus:border-danger focus:ring-danger/30',
-          className
-        )}
-        {...rest}
-      />
-      {helper && !error && (
-        <p id={`${id}-helper`} className="text-xs text-brand-muted">
-          {helper}
-        </p>
-      )}
-      {error && (
-        <p id={`${id}-error`} className="text-xs text-danger">
-          {error}
-        </p>
-      )}
-    </div>
-  );
-});
-
-type SelectFieldProps = FieldBaseProps &
-  SelectHTMLAttributes<HTMLSelectElement> & {
-    options: readonly string[] | ReadonlyArray<{ value: string; label: string }>;
-  };
-
-const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(function SelectField(
-  { label, error, helper, required, options, className, ...rest },
-  ref
-) {
-  const id = rest.id ?? rest.name;
-  return (
-    <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-sm font-semibold text-brand-text">
-        {label} {required && <span className="text-danger">*</span>}
-      </label>
-      <select
-        ref={ref}
-        id={id}
-        aria-invalid={!!error}
-        aria-describedby={error ? `${id}-error` : helper ? `${id}-helper` : undefined}
-        className={cn(
-          'rounded-brand-md border border-brand-border bg-white px-4 py-3 text-brand-text',
-          'focus:border-primary focus:outline-none focus:ring-2 focus:ring-accent/40',
-          error && 'border-danger focus:border-danger focus:ring-danger/30',
-          className
-        )}
-        {...rest}
-      >
-        <option value="" disabled>
-          Selecciona una opción
-        </option>
-        {options.map((opt) => {
-          if (typeof opt === 'string') {
-            return (
-              <option key={opt} value={opt}>
-                {opt}
-              </option>
-            );
-          }
-          return (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          );
-        })}
-      </select>
-      {helper && !error && (
-        <p id={`${id}-helper`} className="text-xs text-brand-muted">
-          {helper}
-        </p>
-      )}
-      {error && (
-        <p id={`${id}-error`} className="text-xs text-danger">
-          {error}
-        </p>
-      )}
-    </div>
-  );
-});
-
-type TextareaFieldProps = FieldBaseProps & TextareaHTMLAttributes<HTMLTextAreaElement>;
-
-const TextareaField = forwardRef<HTMLTextAreaElement, TextareaFieldProps>(function TextareaField(
-  { label, error, helper, className, ...rest },
-  ref
-) {
-  const id = rest.id ?? rest.name;
-  return (
-    <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-sm font-semibold text-brand-text">
-        {label}
-      </label>
-      <textarea
-        ref={ref}
-        id={id}
-        rows={4}
-        aria-invalid={!!error}
-        className={cn(
-          'rounded-brand-md border border-brand-border bg-white px-4 py-3 text-brand-text',
-          'placeholder:text-brand-muted/70 resize-y min-h-[100px]',
-          'focus:border-primary focus:outline-none focus:ring-2 focus:ring-accent/40',
-          error && 'border-danger focus:border-danger focus:ring-danger/30',
-          className
-        )}
-        {...rest}
-      />
-      {helper && !error && <p className="text-xs text-brand-muted">{helper}</p>}
-      {error && <p className="text-xs text-danger">{error}</p>}
-    </div>
-  );
-});

@@ -60,26 +60,40 @@ function escapeHtml(raw: string): string {
 }
 
 function buildMessageText(lead: Lead): string {
-  const businessType = lead.businessType ? escapeHtml(lead.businessType) : '—';
-  const numUsers = lead.numUsers ? escapeHtml(lead.numUsers) : '—';
-  const lines = [
-    '🟢 <b>Nuevo lead · ROHU Solutions</b>',
-    '',
-    `🧩 Aplicación: <b>${escapeHtml(lead.application)}</b>`,
-    '',
-    `👤 <b>${escapeHtml(lead.firstName)}</b>`,
-    `🏢 ${escapeHtml(lead.companyName)}${lead.nit ? ` · NIT ${escapeHtml(lead.nit)}` : ''}`,
-    `📍 ${escapeHtml(lead.city)}`,
-    `✉️ ${escapeHtml(lead.email)}`,
-    `📱 ${escapeHtml(lead.whatsapp)}`,
-    `💼 ${businessType} · ${numUsers} usuarios`,
-  ];
+  const isQuick = lead.formType === 'quick_quote';
+  const header = isQuick
+    ? '💨 <b>Cotización rápida · ROHU Solutions</b>'
+    : '🟢 <b>Nuevo lead · ROHU Solutions</b>';
+
+  const lines: string[] = [header, ''];
+  lines.push(`🧩 Aplicación: <b>${escapeHtml(lead.application)}</b>`);
   if (lead.planInterest) {
     lines.push(`💎 Plan: <b>${escapeHtml(lead.planInterest)}</b>`);
+  }
+  lines.push('');
+
+  lines.push(`👤 <b>${escapeHtml(lead.firstName)}</b>`);
+  lines.push(`📱 ${escapeHtml(lead.whatsapp)}`);
+
+  if (lead.email) {
+    lines.push(`✉️ ${escapeHtml(lead.email)}`);
+  }
+  if (lead.companyName) {
+    const nit = lead.nit ? ` · NIT ${escapeHtml(lead.nit)}` : '';
+    lines.push(`🏢 ${escapeHtml(lead.companyName)}${nit}`);
+  }
+  if (lead.city) {
+    lines.push(`📍 ${escapeHtml(lead.city)}`);
+  }
+  if (lead.businessType || lead.numUsers) {
+    const businessType = lead.businessType ? escapeHtml(lead.businessType) : '—';
+    const numUsers = lead.numUsers ? escapeHtml(lead.numUsers) : '—';
+    lines.push(`💼 ${businessType} · ${numUsers} usuarios`);
   }
   if (lead.message && lead.message.trim().length > 0) {
     lines.push('', `💬 ${escapeHtml(lead.message)}`);
   }
+
   lines.push('', `⏱ ${escapeHtml(lead.createdAt)}`);
   return lines.join('\n');
 }
@@ -106,5 +120,5 @@ function buildInlineKeyboard(lead: Lead): TelegramInlineKeyboard {
       url: `mailto:${lead.email}`,
     });
   }
-  return { inline_keyboard: [row] };
+  return { inline_keyboard: row.length > 0 ? [row] : [] };
 }

@@ -279,7 +279,6 @@ const rohuContable: Application = {
         ],
         highlightedFeatures: ['POS con QR', '1 usuario', 'Modo offline'],
         ctaLabel: 'Cotizar ahora',
-        ctaHref: '#contact?plan=basic',
         billingNote: 'Configuración inicial incluida · sin permanencia',
       },
       {
@@ -301,7 +300,6 @@ const rohuContable: Application = {
         ],
         highlightedFeatures: ['Contabilidad PUC/NIIF', 'Hasta 5 usuarios', 'Soporte prioritario'],
         ctaLabel: 'Cotizar ahora',
-        ctaHref: '#contact?plan=pro',
         billingNote: 'Configuración + capacitación guiada incluidas',
       },
       {
@@ -322,7 +320,6 @@ const rohuContable: Application = {
         ],
         highlightedFeatures: ['Multi-empresa', 'Usuarios ilimitados', 'Contacto dedicado'],
         ctaLabel: 'Cotizar ahora',
-        ctaHref: '#contact?plan=enterprise',
         billingNote: 'Condiciones a la medida · implementación guiada',
       },
     ],

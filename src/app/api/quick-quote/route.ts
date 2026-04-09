@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { leadFormSchema } from '@/components/forms/leadFormSchema';
+import { quickQuoteSchema } from '@/components/forms/quickQuoteSchema';
 import { appendLead } from '@/lib/leadsStore';
 import { notifyTelegram } from '@/lib/notifyTelegram';
 import { sendLeadEmail } from '@/lib/sendLeadEmail';
@@ -9,8 +9,8 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 /**
- * In-memory rate limit — trivial but enough for v1.
- * 5 submissions per IP per minute.
+ * In-memory rate limit. Quick-quote shares the same per-IP budget as the
+ * regular lead endpoint: 5 requests per minute per IP.
  */
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 5;
@@ -37,16 +37,13 @@ function getClientIp(req: NextRequest): string {
 }
 
 function generateId(): string {
-  return `lead_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+  return `quote_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
   if (isRateLimited(ip)) {
-    return NextResponse.json(
-      { ok: false, error: 'rate_limited' },
-      { status: 429 }
-    );
+    return NextResponse.json({ ok: false, error: 'rate_limited' }, { status: 429 });
   }
 
   let payload: unknown;
@@ -56,7 +53,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: 'invalid_json' }, { status: 400 });
   }
 
-  const parsed = leadFormSchema.safeParse(payload);
+  const parsed = quickQuoteSchema.safeParse(payload);
   if (!parsed.success) {
     return NextResponse.json(
       { ok: false, error: 'validation', issues: parsed.error.flatten() },
@@ -64,7 +61,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Reject honeypot hits without leaking detection to the bot
+  // Reject honeypot hits silently
   if (parsed.data.website && parsed.data.website.length > 0) {
     return NextResponse.json({ ok: true }, { status: 200 });
   }
@@ -73,36 +70,27 @@ export async function POST(req: NextRequest) {
     id: generateId(),
     createdAt: new Date().toISOString(),
     firstName: parsed.data.firstName,
-    companyName: parsed.data.companyName,
-    nit: parsed.data.nit,
-    city: parsed.data.city,
-    email: parsed.data.email,
     whatsapp: parsed.data.whatsapp,
-    businessType: parsed.data.businessType,
-    numUsers: parsed.data.numUsers,
-    message: parsed.data.message,
-    planInterest: parsed.data.planInterest,
+    email: parsed.data.email && parsed.data.email.length > 0 ? parsed.data.email : undefined,
     application: parsed.data.application,
+    planInterest: parsed.data.planInterest,
     habeasData: true,
     source: 'rohu-marketing-web',
-    formType: 'full_lead',
+    formType: 'quick_quote',
   };
 
   try {
     await appendLead(lead);
   } catch (err) {
     // eslint-disable-next-line no-console
-    console.error('[api/leads] appendLead failed', err);
-    // Don't fail the lead because of local storage issues on ephemeral dynos.
+    console.error('[api/quick-quote] appendLead failed', err);
   }
 
-  // Fire-and-forget: notify the owner on Telegram
+  // Fire-and-forget notifications
   void notifyTelegram(lead);
-
-  // Fire-and-forget: send email notification to the owner
   void sendLeadEmail(lead);
 
-  // Optional: forward to an external CRM webhook
+  // Optional CRM webhook forwarding
   const crmUrl = process.env.LEAD_API_URL;
   if (crmUrl && crmUrl.startsWith('http')) {
     void fetch(crmUrl, {
@@ -111,7 +99,7 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify(lead),
     }).catch((err) => {
       // eslint-disable-next-line no-console
-      console.error('[api/leads] forward to LEAD_API_URL failed', err);
+      console.error('[api/quick-quote] forward to LEAD_API_URL failed', err);
     });
   }
 

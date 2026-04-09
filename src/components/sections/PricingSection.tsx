@@ -1,9 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { Check, Sparkles } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { Badge } from '@/components/ui/Badge';
+import { QuickQuoteModal } from '@/components/forms/QuickQuoteModal';
 import type { PricingTier } from '@/types/pricingTier';
 import { trackEvent, EVENTS } from '@/lib/analytics';
 import { cn } from '@/lib/cn';
@@ -17,6 +19,18 @@ type Props = {
 };
 
 export function PricingSection({ eyebrow, title, subtitle, tiers, applicationId }: Props) {
+  // The selected tier drives the QuickQuoteModal: open when not null, closed otherwise.
+  const [openTier, setOpenTier] = useState<PricingTier | null>(null);
+
+  const handleOpenQuote = (tier: PricingTier) => {
+    trackEvent(EVENTS.CLICK_PRICING, {
+      plan_id: tier.id,
+      plan_name: tier.name,
+      application_id: applicationId ?? null,
+    });
+    setOpenTier(tier);
+  };
+
   return (
     <section id="pricing" className="section bg-white">
       <Container>
@@ -24,7 +38,7 @@ export function PricingSection({ eyebrow, title, subtitle, tiers, applicationId 
 
         <ul className="mt-12 grid gap-6 md:grid-cols-3 items-stretch">
           {tiers.map((tier) => (
-            <PricingCard key={tier.id} tier={tier} applicationId={applicationId} />
+            <PricingCard key={tier.id} tier={tier} onQuote={handleOpenQuote} />
           ))}
         </ul>
 
@@ -32,11 +46,23 @@ export function PricingSection({ eyebrow, title, subtitle, tiers, applicationId 
           Los precios se ajustan al tamaño y necesidades de tu empresa. Cotiza sin compromiso.
         </p>
       </Container>
+
+      <QuickQuoteModal
+        open={openTier !== null}
+        onClose={() => setOpenTier(null)}
+        tier={openTier}
+        applicationId={applicationId ?? 'general'}
+      />
     </section>
   );
 }
 
-function PricingCard({ tier, applicationId }: { tier: PricingTier; applicationId?: string }) {
+type PricingCardProps = {
+  tier: PricingTier;
+  onQuote: (tier: PricingTier) => void;
+};
+
+function PricingCard({ tier, onQuote }: PricingCardProps) {
   return (
     <li
       className={cn(
@@ -71,24 +97,28 @@ function PricingCard({ tier, applicationId }: { tier: PricingTier; applicationId
         ))}
       </ul>
 
-      <a
-        href={tier.ctaHref}
-        onClick={() =>
-          trackEvent(EVENTS.CLICK_PRICING, {
-            plan_id: tier.id,
-            plan_name: tier.name,
-            application_id: applicationId ?? null,
-          })
-        }
+      {/*
+       * Real <button> instead of <a href="#contact?plan=...">.
+       * The previous implementation was broken because '?plan=...' inside a
+       * fragment URL is not a query string — the browser looked for an
+       * element with id="contact?plan=basic" that doesn't exist, so the
+       * scroll silently failed. Now the click opens the QuickQuoteModal via
+       * React state — no URL navigation involved.
+       */}
+      <button
+        type="button"
+        onClick={() => onQuote(tier)}
+        aria-label={`Cotizar el plan ${tier.name}`}
         className={cn(
           'mt-8 text-center py-3 rounded-brand-lg font-semibold transition-all',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-white',
           tier.isPopular
             ? 'bg-gradient-cta text-white shadow-signature hover:shadow-elevated hover:scale-[1.01]'
             : 'bg-primary text-white hover:bg-primary-dark'
         )}
       >
         {tier.ctaLabel}
-      </a>
+      </button>
 
       <p className="mt-3 text-center text-xs text-brand-muted">{tier.billingNote}</p>
     </li>

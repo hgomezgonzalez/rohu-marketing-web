@@ -15,6 +15,13 @@ export const EVENTS = {
   CLICK_DEMO: 'click_demo',
   COPY_DEMO_CREDENTIALS: 'copy_demo_credentials',
   CLICK_PRICING: 'click_pricing',
+  // Quick-quote modal flow
+  VIEW_QUICK_QUOTE_MODAL: 'view_quick_quote_modal',
+  CLOSE_QUICK_QUOTE_MODAL: 'close_quick_quote_modal',
+  SUBMIT_QUICK_QUOTE: 'submit_quick_quote',
+  SUBMIT_QUICK_QUOTE_SUCCESS: 'submit_quick_quote_success',
+  SUBMIT_QUICK_QUOTE_ERROR: 'submit_quick_quote_error',
+  // Long lead form flow
   SUBMIT_LEAD: 'submit_lead',
   SUBMIT_LEAD_SUCCESS: 'submit_lead_success',
   SUBMIT_LEAD_ERROR: 'submit_lead_error',
