@@ -16,6 +16,16 @@
     @apply bg-brand-bg text-brand-text font-body antialiased;
   }
 
+  /*
+   * Compensate for the double sticky header (main header ~64-72px + in-page
+   * navigation ~56px) when smooth-scrolling to anchored sections.
+   * Applies globally to any <section id="..."> target, so anchor links from
+   * the main header and the in-page nav always land with breathing room.
+   */
+  section[id] {
+    scroll-margin-top: 140px;
+  }
+
   h1,
   h2,
   h3,

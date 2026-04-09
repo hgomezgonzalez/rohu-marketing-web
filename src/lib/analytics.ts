@@ -10,6 +10,7 @@ export const EVENTS = {
   VIEW_COMPANY_HOME: 'view_company_home',
   VIEW_APPLICATION_PAGE: 'view_application_page',
   CLICK_APPLICATION_CARD: 'click_application_card',
+  CLICK_INPAGE_NAV: 'click_inpage_nav',
   VIEW_LANDING: 'view_landing', // kept for backwards compatibility
   CLICK_DEMO: 'click_demo',
   COPY_DEMO_CREDENTIALS: 'copy_demo_credentials',

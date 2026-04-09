@@ -2,6 +2,10 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { ApplicationHeroSection } from '@/components/sections/ApplicationHeroSection';
+import {
+  InPageNavigation,
+  DEFAULT_APP_NAV_ITEMS,
+} from '@/components/sections/InPageNavigation';
 import { BenefitsSection } from '@/components/sections/BenefitsSection';
 import { AudienceSection } from '@/components/sections/AudienceSection';
 import { HowItWorksSection } from '@/components/sections/HowItWorksSection';
@@ -16,7 +20,7 @@ import {
   getApplicationBySlug,
   getLiveApplicationSlugs,
 } from '@/lib/applications';
-import { siteConfig } from '@/lib/content';
+import { siteConfig, FEATURE_FLAGS } from '@/lib/content';
 
 type Params = { params: { slug: string } };
 
@@ -86,6 +90,7 @@ export default function ApplicationPage({ params }: Params) {
       />
       <ApplicationViewTracker applicationId={app.id} />
       <ApplicationHeroSection app={app} />
+      <InPageNavigation items={DEFAULT_APP_NAV_ITEMS} applicationId={app.id} />
       <BenefitsSection
         eyebrow={app.benefits.eyebrow}
         title={app.benefits.sectionTitle}
@@ -122,6 +127,7 @@ export default function ApplicationPage({ params }: Params) {
         title={app.socialProof.sectionTitle}
         disclaimer={app.socialProof.disclaimer}
         testimonials={app.socialProof.testimonials}
+        pending={!FEATURE_FLAGS.TESTIMONIALS_PUBLISHED}
       />
       <FaqSection
         eyebrow={app.faqs.eyebrow}

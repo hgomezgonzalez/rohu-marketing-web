@@ -184,7 +184,7 @@ const rohuContable: Application = {
       {
         id: 'financial_statements',
         title: 'Estados financieros',
-        description: 'Balance general, PyG y flujo de caja generados desde tus transacciones.',
+        description: 'Balance general, estado de resultados y flujo de caja generados desde tus transacciones.',
         icon: 'FileBarChart2',
       },
       {
@@ -251,7 +251,7 @@ const rohuContable: Application = {
       { id: 'collections', label: 'Cobro de cartera', description: 'Gestiona cuentas por cobrar y pagos pendientes.', icon: 'Wallet' },
       { id: 'reports', label: 'Reportes', description: 'Exporta ventas, compras y movimientos cuando los necesites.', icon: 'FileText' },
       { id: 'analytics', label: 'Análisis', description: 'Gráficas de tendencias para entender tu negocio.', icon: 'TrendingUp' },
-      { id: 'financial', label: 'Estados financieros', description: 'Balance y PyG listos para revisar con tu contador.', icon: 'FileBarChart2' },
+      { id: 'financial', label: 'Estados financieros', description: 'Balance y estado de resultados listos para revisar con tu contador.', icon: 'FileBarChart2' },
       { id: 'dian_support', label: 'Soporte DIAN', description: 'Información de referencia sobre obligaciones tributarias frecuentes.', icon: 'ShieldCheck' },
       { id: 'accounting', label: 'Contabilidad', description: 'Partidas dobles, cuentas PUC y reportes bajo NIIF.', icon: 'Calculator' },
       { id: 'cash_bank', label: 'Caja y bancos', description: 'Concilia movimientos de caja y cuentas bancarias fácilmente.', icon: 'Banknote' },

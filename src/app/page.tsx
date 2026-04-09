@@ -7,7 +7,7 @@ import { SocialProofSection } from '@/components/sections/SocialProofSection';
 import { FaqSection } from '@/components/sections/FaqSection';
 import { CtaSection } from '@/components/sections/CtaSection';
 import { CompanyViewTracker } from '@/components/CompanyViewTracker';
-import { companyContent } from '@/lib/content';
+import { companyContent, FEATURE_FLAGS } from '@/lib/content';
 
 export default function CompanyHomePage() {
   return (
@@ -22,6 +22,7 @@ export default function CompanyHomePage() {
         title={companyContent.socialProof.section_title}
         disclaimer={companyContent.socialProof.disclaimer}
         testimonials={companyContent.socialProof.testimonials}
+        pending={!FEATURE_FLAGS.TESTIMONIALS_PUBLISHED}
       />
       <FaqSection
         eyebrow={companyContent.faqs.eyebrow}

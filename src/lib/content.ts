@@ -16,16 +16,17 @@ export const siteConfig = {
   legalName: 'ROHU Soluciones',
   brand: 'ROHU',
   description:
-    'ROHU Solutions desarrolla aplicaciones SaaS verticales para que las pymes colombianas gestionen su negocio con tecnología propia, asequible y especializada.',
-  tagline: 'Aplicaciones SaaS verticales para pymes colombianas',
+    'ROHU Solutions desarrolla aplicaciones SaaS verticales para que mipymes y grandes empresas en Colombia y otras partes del mundo gestionen su negocio con tecnología propia, asequible y especializada por sector.',
+  tagline: 'Aplicaciones SaaS verticales para empresas en Colombia y el mundo',
   locale: 'es-CO',
   keywords: [
     'ROHU Solutions',
     'software colombia',
     'SaaS colombia',
-    'apps verticales pymes',
+    'apps verticales mipymes',
+    'software latam',
     'ROHU Contable',
-    'soluciones tecnológicas pymes',
+    'soluciones tecnológicas mipymes',
     'software contable',
     'POS colombia',
     'contabilidad PUC',
@@ -49,7 +50,7 @@ export const companyContent = {
     eyebrow: 'ROHU Solutions · Colombia',
     h1: 'Aplicaciones SaaS que conectan tu operación con las exigencias del comercio colombiano',
     subheadline:
-      'Software vertical hecho en Colombia para que las pymes gestionen su negocio con tecnología propia, asequible y especializada por sector.',
+      'Software vertical hecho en Colombia, al alcance de mipymes y grandes empresas. Atendemos en todo el país y remotamente a clientes en otras partes del mundo.',
     cta_primary_label: 'Explora nuestras apps',
     cta_secondary_label: 'Habla con un asesor',
   },
@@ -71,7 +72,7 @@ export const companyContent = {
     eyebrow: 'Sobre ROHU Solutions',
     section_title: 'Apps verticales hechas en Colombia para cada tipo de negocio',
     paragraph:
-      'ROHU Solutions es una empresa colombiana que desarrolla aplicaciones SaaS especializadas por sector. En lugar de un ERP genérico con módulos desactivados, cada app se piensa desde cero para una vertical: contabilidad, restaurantes, salud, educación, inmobiliario. Combinamos tecnología moderna con conocimiento contable y operacional del mercado local para que crecer sea simple.',
+      'ROHU Solutions es una empresa colombiana que desarrolla aplicaciones SaaS especializadas por sector. En lugar de un ERP genérico con módulos desactivados, cada app se piensa desde cero para una vertical: contabilidad, restaurantes, salud, educación, inmobiliario. Atendemos a mipymes y grandes empresas en Colombia y, de forma remota, a clientes en otras partes del mundo. Combinamos tecnología moderna con conocimiento contable y operacional del mercado local para que crecer sea simple.',
     values: [
       {
         id: 'rigor',
@@ -89,7 +90,7 @@ export const companyContent = {
         description: 'Adopta una app y suma otras del catálogo sin cambiar de proveedor ni perder tus datos.',
       },
     ],
-    closing: 'Queremos ser el equipo tecnológico de confianza de cientos de pymes colombianas.',
+    closing: 'Queremos ser el equipo tecnológico de confianza de cientos de empresas en Colombia y otras partes del mundo.',
   },
 
   process: {
@@ -166,13 +167,13 @@ export const companyContent = {
         id: 'who',
         question: '¿Quiénes son ROHU Solutions?',
         answer:
-          'Somos una empresa colombiana dedicada a desarrollar aplicaciones SaaS para el comercio y las pymes. Combinamos tecnología moderna con conocimiento contable y operacional del mercado local.',
+          'Somos una empresa colombiana dedicada a desarrollar aplicaciones SaaS verticales para mipymes y grandes empresas. Combinamos tecnología moderna con conocimiento contable y operacional del mercado local.',
       },
       {
         id: 'location',
         question: '¿Dónde están ubicados y a dónde llegan?',
         answer:
-          'Operamos desde Colombia y atendemos a clientes en todo el territorio nacional de forma remota. Para implementaciones in-situ coordinamos visitas según necesidad.',
+          'Operamos desde Colombia. Atendemos de forma remota a clientes en todo el país y también a clientes en otras partes del mundo. Para implementaciones in-situ coordinamos visitas según la ubicación y la necesidad del proyecto.',
       },
       {
         id: 'cost',
@@ -220,9 +221,9 @@ export const companyContent = {
   },
 
   footer: {
-    tagline: 'Soluciones tecnológicas para el comercio colombiano.',
+    tagline: 'Soluciones tecnológicas hechas en Colombia, al servicio del mundo.',
     description:
-      'ROHU Solutions desarrolla aplicaciones SaaS apalancadas en conocimientos contables y operacionales para cumplir las políticas colombianas con tranquilidad.',
+      'ROHU Solutions desarrolla aplicaciones SaaS apalancadas en conocimientos contables y operacionales para cumplir las políticas colombianas. Atendemos mipymes y grandes empresas en Colombia y, de forma remota, a clientes en otras partes del mundo.',
     applications_title: 'Aplicaciones',
     contact_title: 'Contáctanos',
     legal_title: 'Legal',
@@ -280,4 +281,32 @@ export const commonContent = {
     external_link_tooltip:
       'Al hacer clic serás redirigido a una plataforma de terceros. ROHU no controla esos servicios y aplican sus propios términos.',
   },
+} as const;
+
+/**
+ * Feature flags for gradual rollouts. Flip a flag and redeploy to enable.
+ */
+export const FEATURE_FLAGS = {
+  /**
+   * Set to true only when at least one real customer has authorized the
+   * publication of their testimonial in writing. While false, the
+   * SocialProofSection renders a "recopilando testimonios" placeholder
+   * instead of the mock cards (which stay in the registry, unused).
+   */
+  TESTIMONIALS_PUBLISHED: false,
+} as const;
+
+/**
+ * Copy shown by SocialProofSection while TESTIMONIALS_PUBLISHED is false.
+ * Separated so legal/brand can review it independently.
+ */
+export const pendingTestimonialsCopy = {
+  eyebrow: 'Testimonios',
+  title: 'Estamos recopilando testimonios reales',
+  body:
+    'Publicaremos próximamente las experiencias de nuestros clientes, siempre con su autorización expresa conforme a la Ley 1581 de 2012. Mientras tanto, puedes conocer más sobre ROHU Solutions escribiéndonos directamente.',
+  note:
+    'Todos los testimonios se publicarán con el consentimiento informado del cliente.',
+  cta_label: 'Habla con un asesor',
+  cta_href: '#contact',
 } as const;
