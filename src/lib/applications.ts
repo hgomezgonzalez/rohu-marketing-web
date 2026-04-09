@@ -278,7 +278,7 @@ const rohuContable: Application = {
           'Soporte por email',
         ],
         highlightedFeatures: ['POS con QR', '1 usuario', 'Modo offline'],
-        ctaLabel: 'Cotizar ahora',
+        ctaLabel: 'Pedir propuesta',
         billingNote: 'Configuración inicial incluida · sin permanencia',
       },
       {
@@ -299,7 +299,7 @@ const rohuContable: Application = {
           'Soporte prioritario por chat',
         ],
         highlightedFeatures: ['Contabilidad PUC/NIIF', 'Hasta 5 usuarios', 'Soporte prioritario'],
-        ctaLabel: 'Cotizar ahora',
+        ctaLabel: 'Pedir propuesta',
         billingNote: 'Configuración + capacitación guiada incluidas',
       },
       {
@@ -319,7 +319,7 @@ const rohuContable: Application = {
           'Contacto dedicado de soporte',
         ],
         highlightedFeatures: ['Multi-empresa', 'Usuarios ilimitados', 'Contacto dedicado'],
-        ctaLabel: 'Cotizar ahora',
+        ctaLabel: 'Pedir propuesta',
         billingNote: 'Condiciones a la medida · implementación guiada',
       },
     ],

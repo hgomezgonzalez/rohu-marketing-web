@@ -43,7 +43,7 @@ export function PricingSection({ eyebrow, title, subtitle, tiers, applicationId 
         </ul>
 
         <p className="mt-8 text-center text-xs text-brand-muted">
-          Los precios se ajustan al tamaño y necesidades de tu empresa. Cotiza sin compromiso.
+          Los precios se ajustan al tamaño y necesidades de tu empresa. Solicita una propuesta sin compromiso.
         </p>
       </Container>
 

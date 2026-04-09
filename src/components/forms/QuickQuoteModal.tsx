@@ -21,6 +21,7 @@ import {
 import type { PricingTier } from '@/types/pricingTier';
 import { trackEvent, EVENTS } from '@/lib/analytics';
 import { buildWhatsAppUrl, getWhatsAppConfig } from '@/lib/contactChannels';
+import { saveQuickQuoteHandoff } from '@/lib/quickQuoteHandoff';
 import { cn } from '@/lib/cn';
 
 type Props = {
@@ -38,7 +39,11 @@ const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 /**
- * Quick-quote dialog. Implements:
+ * Quick-lead dialog (labeled "Propuesta personalizada" per legal-compliance
+ * agent — the original "Cotización" wording was rejected for creating
+ * implicit price commitments under Art. 23 Ley 1480/2011).
+ *
+ * Implements:
  * - React portal to escape any parent stacking context.
  * - Body scroll lock with scrollbar-width compensation (avoids layout shift).
  * - Escape key, backdrop click and X button to close.
@@ -46,6 +51,11 @@ const FOCUSABLE_SELECTOR =
  * - Auto-focus on the first input when opened.
  * - Return focus to the previously focused element on close.
  * - Single-modal state machine: idle → loading → success | error.
+ * - Personal fields (firstName/whatsapp/email) persist across reopen so
+ *   switching from Basic to Pro doesn't wipe what the visitor already typed
+ *   (funnel-designer recommendation). Only planInterest resets per-open.
+ * - On "open full form" fallback, hands off the typed values via
+ *   sessionStorage so the long lead form pre-fills them (no data loss).
  *
  * Hand-rolled (no @radix-ui/react-dialog) to keep the bundle minimal.
  */
@@ -55,6 +65,7 @@ export function QuickQuoteModal({ open, onClose, tier, applicationId }: Props) {
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
   const [submitState, setSubmitState] = useState<SubmitState>('idle');
   const [mounted, setMounted] = useState(false);
+  const [successFirstName, setSuccessFirstName] = useState('');
   const { phone } = getWhatsAppConfig();
 
   // Mount portal on client only
@@ -65,6 +76,8 @@ export function QuickQuoteModal({ open, onClose, tier, applicationId }: Props) {
   const {
     register,
     handleSubmit,
+    setValue,
+    getValues,
     reset,
     formState: { errors, isSubmitting },
   } = useForm<QuickQuoteValues>({
@@ -81,21 +94,19 @@ export function QuickQuoteModal({ open, onClose, tier, applicationId }: Props) {
     },
   });
 
-  // Reset form whenever the modal opens with a new tier
+  // When the modal opens, update planInterest to match the clicked tier but
+  // KEEP the personal fields intact so the visitor doesn't lose what they
+  // already typed in a previous attempt. Reset only when we land on success.
   useEffect(() => {
     if (open && tier) {
-      reset({
-        firstName: '',
-        whatsapp: '',
-        email: '',
-        application: applicationId,
-        planInterest: tier.id,
-        habeasData: false as unknown as true,
-        website: '',
-      });
-      setSubmitState('idle');
+      setValue('planInterest', tier.id);
+      setValue('application', applicationId);
+      // Clear error state on reopen; keep idle unless we were in success (which
+      // should only happen after a full close cycle, handled elsewhere).
+      if (submitState === 'error') setSubmitState('idle');
     }
-  }, [open, tier, applicationId, reset]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, tier, applicationId]);
 
   // Body scroll lock + scrollbar compensation
   useEffect(() => {
@@ -139,6 +150,35 @@ export function QuickQuoteModal({ open, onClose, tier, applicationId }: Props) {
     };
   }, [open, tier, applicationId]);
 
+  const handleClose = useCallback(
+    (reason: 'escape' | 'backdrop' | 'close_button' | 'success' | 'open_full_form') => {
+      if (tier) {
+        trackEvent(EVENTS.CLOSE_QUICK_QUOTE_MODAL, {
+          reason,
+          application_id: applicationId,
+          plan_id: tier.id,
+          plan_name: tier.name,
+          submit_state: submitState,
+        });
+      }
+      // If we're closing after success, reset the form so the next open starts fresh
+      if (reason === 'success') {
+        reset({
+          firstName: '',
+          whatsapp: '',
+          email: '',
+          application: applicationId,
+          planInterest: '',
+          habeasData: false as unknown as true,
+          website: '',
+        });
+        setSubmitState('idle');
+      }
+      onClose(reason);
+    },
+    [applicationId, tier, submitState, onClose, reset]
+  );
+
   // Escape + focus trap key handlers
   useEffect(() => {
     if (!open) return;
@@ -169,31 +209,24 @@ export function QuickQuoteModal({ open, onClose, tier, applicationId }: Props) {
 
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
-
-  const handleClose = useCallback(
-    (reason: Props['onClose'] extends (r: infer R) => void ? R : never) => {
-      if (tier) {
-        trackEvent(EVENTS.CLOSE_QUICK_QUOTE_MODAL, {
-          reason,
-          application_id: applicationId,
-          plan_id: tier.id,
-          plan_name: tier.name,
-          submit_state: submitState,
-        });
-      }
-      onClose(reason);
-    },
-    [applicationId, tier, submitState, onClose]
-  );
+  }, [open, handleClose]);
 
   const handleOpenFullForm = useCallback(() => {
     if (!tier) return;
+    // Persist whatever the visitor already typed so the long form can hydrate
+    // (funnel-designer: "El esfuerzo del usuario es sagrado").
+    const current = getValues();
+    saveQuickQuoteHandoff({
+      firstName: current.firstName,
+      whatsapp: current.whatsapp,
+      email: current.email,
+      planInterest: tier.id,
+    });
     handleClose('open_full_form');
-    // Use the real query string + hash so the LeadForm preselects the plan
+    // Real query + hash — this is the canonical way to navigate to the
+    // contact section with a preselected plan (the LeadForm reads searchParams).
     router.push(`?plan=${tier.id}#contact`);
-  }, [router, tier, handleClose]);
+  }, [router, tier, getValues, handleClose]);
 
   const onSubmit: SubmitHandler<QuickQuoteValues> = async (data) => {
     if (!tier) return;
@@ -202,6 +235,7 @@ export function QuickQuoteModal({ open, onClose, tier, applicationId }: Props) {
       application_id: applicationId,
       plan_id: tier.id,
       plan_name: tier.name,
+      has_email: Boolean(data.email && data.email.length > 0),
     });
     try {
       const res = await fetch('/api/quick-quote', {
@@ -214,7 +248,9 @@ export function QuickQuoteModal({ open, onClose, tier, applicationId }: Props) {
         application_id: applicationId,
         plan_id: tier.id,
         plan_name: tier.name,
+        has_email: Boolean(data.email && data.email.length > 0),
       });
+      setSuccessFirstName(data.firstName);
       setSubmitState('success');
     } catch (err) {
       trackEvent(EVENTS.SUBMIT_QUICK_QUOTE_ERROR, {
@@ -230,7 +266,7 @@ export function QuickQuoteModal({ open, onClose, tier, applicationId }: Props) {
 
   if (!mounted || !open || !tier) return null;
 
-  const waMessage = `Hola, me interesa cotizar el plan ${tier.name} de ROHU Contable.`;
+  const waMessage = `Hola, me interesa conocer más del plan ${tier.name} de ROHU Contable.`;
   const waHref = phone ? buildWhatsAppUrl(phone, waMessage) : null;
 
   const dialog = (
@@ -243,9 +279,9 @@ export function QuickQuoteModal({ open, onClose, tier, applicationId }: Props) {
       {/* Backdrop */}
       <button
         type="button"
-        aria-label="Cerrar cotización rápida"
+        aria-label="Cerrar"
         onClick={() => handleClose('backdrop')}
-        className="absolute inset-0 bg-brand-text/60 backdrop-blur-sm animate-fade-in-up motion-reduce:animate-none"
+        className="absolute inset-0 bg-brand-text/60 backdrop-blur-sm transition-opacity duration-200 ease-out motion-reduce:transition-none"
         tabIndex={-1}
       />
 
@@ -253,43 +289,48 @@ export function QuickQuoteModal({ open, onClose, tier, applicationId }: Props) {
       <div
         ref={dialogRef}
         className={cn(
-          'relative w-full sm:max-w-md bg-white shadow-elevated overflow-hidden',
+          'relative w-full sm:max-w-md bg-white shadow-signature overflow-hidden',
           'rounded-t-brand-xl sm:rounded-brand-xl',
           'max-h-[92vh] flex flex-col',
-          'animate-fade-in-up motion-reduce:animate-none'
+          'transition-all duration-200 ease-out motion-reduce:transition-none',
+          'animate-fade-in-up'
         )}
       >
-        {/* Header with plan badge */}
-        <div className="relative bg-gradient-cta text-white p-5 sm:p-6">
+        {/* Header with plan name — uses gradient-hero (brand-designer spec) */}
+        <div className="relative bg-gradient-hero text-white p-5 sm:p-6 flex-shrink-0">
           <button
             type="button"
             aria-label="Cerrar"
             onClick={() => handleClose('close_button')}
-            className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full text-white/90 hover:bg-white/15 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-secondary"
+            className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full text-white/90 hover:bg-white/15 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
           >
             <X size={20} strokeWidth={2} />
           </button>
 
           <p className="text-[11px] uppercase tracking-wider font-semibold opacity-85">
-            Cotización rápida
+            Propuesta personalizada
           </p>
           <h2 id="quick-quote-title" className="mt-1 text-xl sm:text-2xl font-extrabold pr-10">
             Plan {tier.name}
           </h2>
           <p className="mt-1 text-sm text-white/90">
-            Te contactamos en menos de 24 horas hábiles.
+            Cuéntanos cómo contactarte y nuestro equipo te responde pronto.
           </p>
         </div>
 
         {/* Body — switches between idle/loading/success/error */}
-        <div className="flex-1 overflow-y-auto p-5 sm:p-6">
+        <div className="flex-1 overflow-y-auto">
           {submitState === 'success' ? (
             <SuccessState
-              firstName={getCurrentFirstName(dialogRef)}
+              firstName={successFirstName}
               onClose={() => handleClose('success')}
             />
           ) : (
-            <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              noValidate
+              className="p-5 sm:p-6 flex flex-col gap-4"
+            >
               {submitState === 'error' && (
                 <div
                   role="alert"
@@ -302,19 +343,18 @@ export function QuickQuoteModal({ open, onClose, tier, applicationId }: Props) {
                     className="text-danger flex-shrink-0 mt-0.5"
                   />
                   <div>
-                    <p className="text-sm font-semibold text-danger">
-                      No pudimos enviar tu solicitud
-                    </p>
+                    <p className="text-sm font-semibold text-danger">Algo salió mal</p>
                     <p className="text-xs text-danger/80 mt-0.5">
-                      Revisa tu conexión e inténtalo de nuevo, o escríbenos directamente por WhatsApp.
+                      No pudimos enviar tu solicitud. Inténtalo de nuevo o escríbenos
+                      directamente por WhatsApp.
                     </p>
                   </div>
                 </div>
               )}
 
               <Field
-                label="Nombre"
-                placeholder="¿Cómo te llamas?"
+                label="Nombre completo"
+                placeholder="¿Cómo te llamamos?"
                 autoComplete="given-name"
                 error={errors.firstName?.message}
                 required
@@ -325,8 +365,8 @@ export function QuickQuoteModal({ open, onClose, tier, applicationId }: Props) {
                 label="WhatsApp"
                 type="tel"
                 inputMode="tel"
-                placeholder="3001234567"
-                helper="Solo dígitos, sin indicativo de país."
+                placeholder="Ej. 300 123 4567"
+                helper="Número colombiano a 10 dígitos."
                 autoComplete="tel"
                 error={errors.whatsapp?.message}
                 required
@@ -336,7 +376,8 @@ export function QuickQuoteModal({ open, onClose, tier, applicationId }: Props) {
               <Field
                 label="Correo electrónico (opcional)"
                 type="email"
-                placeholder="tu@correo.com"
+                placeholder="tucorreo@empresa.com"
+                helper="Si prefieres recibir información también por correo."
                 autoComplete="email"
                 error={errors.email?.message}
                 {...register('email')}
@@ -359,7 +400,7 @@ export function QuickQuoteModal({ open, onClose, tier, applicationId }: Props) {
                   {...register('habeasData')}
                 />
                 <span>
-                  Acepto el tratamiento de mis datos según la{' '}
+                  Acepto la{' '}
                   <Link
                     href="/privacidad"
                     target="_blank"
@@ -367,17 +408,31 @@ export function QuickQuoteModal({ open, onClose, tier, applicationId }: Props) {
                   >
                     Política de Privacidad
                   </Link>{' '}
-                  de ROHU Solutions, conforme a la Ley 1581 de 2012.
+                  de ROHU Solutions y autorizo el tratamiento de mis datos conforme a la Ley
+                  1581 de 2012.
                 </span>
               </label>
               {errors.habeasData && (
                 <p className="text-xs text-danger -mt-2">{errors.habeasData.message}</p>
               )}
 
+              {/*
+               * Primary submit button: solid bg-primary, NOT btn-cta
+               * (brand-designer: "No usar gradient-cta en el botón submit —
+               * duplica semántica del CTA principal del sitio").
+               */}
               <button
                 type="submit"
                 disabled={isSubmitting || submitState === 'loading'}
-                className="btn-cta py-3 text-base mt-1 w-full"
+                className={cn(
+                  'inline-flex items-center justify-center gap-2 w-full py-3 rounded-brand-md',
+                  'bg-primary text-white font-semibold text-base shadow-signature',
+                  'transition-all duration-150',
+                  'hover:bg-primary-dark hover:shadow-elevated',
+                  'active:scale-[0.99]',
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                  'disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none'
+                )}
               >
                 {isSubmitting || submitState === 'loading' ? (
                   <>
@@ -387,39 +442,56 @@ export function QuickQuoteModal({ open, onClose, tier, applicationId }: Props) {
                 ) : (
                   <>
                     <CheckCircle2 size={18} strokeWidth={2} />
-                    Solicitar cotización
+                    Enviar solicitud
                   </>
                 )}
               </button>
 
               <p className="text-[11px] text-center text-brand-muted">
-                Sin compromiso. No vendemos ni compartimos tus datos con terceros.
+                Sin compromiso. Solo te contactamos si tú lo autorizas.
               </p>
             </form>
           )}
         </div>
 
-        {/* Footer with secondary CTAs (only when not in success state) */}
+        {/*
+         * Footer with secondary CTAs (only in idle/error/loading states).
+         * Funnel-designer spec: a visual separator with the microcopy
+         * "¿Prefieres otro canal?" reframes these as alternatives, not
+         * competitors with the primary submit.
+         */}
         {submitState !== 'success' && (
-          <div className="border-t border-brand-border p-4 flex flex-col gap-2 text-center bg-brand-bg/40">
-            {waHref && (
-              <a
-                href={waHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-secondary-dark hover:text-secondary"
+          <div className="flex-shrink-0 border-t border-brand-border bg-brand-bg/40">
+            <div className="relative px-6 pt-4 pb-1">
+              <div className="flex items-center gap-3">
+                <span className="h-px flex-1 bg-brand-border" aria-hidden="true" />
+                <span className="text-[10px] uppercase tracking-wider font-semibold text-brand-muted">
+                  ¿Prefieres otro canal?
+                </span>
+                <span className="h-px flex-1 bg-brand-border" aria-hidden="true" />
+              </div>
+            </div>
+
+            <div className="px-5 sm:px-6 pb-5 pt-3 flex flex-col gap-3 items-center">
+              {waHref && (
+                <a
+                  href={waHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-secondary-dark hover:text-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 rounded-sm"
+                >
+                  <MessageCircle size={16} strokeWidth={2} />
+                  Chatear por WhatsApp
+                </a>
+              )}
+              <button
+                type="button"
+                onClick={handleOpenFullForm}
+                className="text-xs text-brand-muted hover:text-primary underline underline-offset-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-sm"
               >
-                <MessageCircle size={16} strokeWidth={2} />
-                Prefiero chatear por WhatsApp
-              </a>
-            )}
-            <button
-              type="button"
-              onClick={handleOpenFullForm}
-              className="text-xs text-brand-muted hover:text-primary underline underline-offset-2"
-            >
-              ¿Quieres darnos más detalles? Ir al formulario completo
-            </button>
+                ¿Quieres darnos más contexto antes de la propuesta?
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -427,16 +499,6 @@ export function QuickQuoteModal({ open, onClose, tier, applicationId }: Props) {
   );
 
   return createPortal(dialog, document.body);
-}
-
-/**
- * Reads the current value of the firstName input directly from the DOM so the
- * success message can greet the visitor by name without re-rendering on every
- * keystroke. The form has already validated and submitted at this point.
- */
-function getCurrentFirstName(ref: React.RefObject<HTMLDivElement>): string {
-  const input = ref.current?.querySelector<HTMLInputElement>('input[name="firstName"]');
-  return input?.value?.trim() || '';
 }
 
 function SuccessState({
@@ -447,21 +509,26 @@ function SuccessState({
   onClose: () => void;
 }) {
   return (
-    <div className="flex flex-col items-center text-center py-4">
+    <div className="flex flex-col items-center text-center p-6 sm:p-8 py-10">
       <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-success/15 text-success">
         <CheckCircle2 size={36} strokeWidth={2} />
       </span>
       <h3 className="mt-4 text-xl font-extrabold text-brand-text">
-        {firstName ? `¡Gracias, ${firstName}!` : '¡Recibido!'}
+        {firstName ? `¡Listo, ${firstName}!` : '¡Solicitud recibida!'}
       </h3>
+      {/*
+       * Legal-compliance agent exact wording: "habitualmente" converts the
+       * time promise into an expected value instead of a contractual guarantee
+       * (Art. 845 Cód. Comercio + Art. 30 Ley 1480/2011).
+       */}
       <p className="mt-2 text-sm text-brand-muted leading-relaxed max-w-sm">
-        Recibimos tu solicitud. Un asesor de ROHU Solutions te escribirá por WhatsApp
-        en menos de 24 horas hábiles con la cotización personalizada.
+        Recibido. Nuestro equipo revisará tu solicitud y te contactará por WhatsApp,
+        habitualmente en menos de 24 horas hábiles.
       </p>
       <button
         type="button"
         onClick={onClose}
-        className="btn-primary mt-6 px-6 py-3"
+        className="mt-6 inline-flex items-center justify-center px-6 py-3 rounded-brand-md bg-primary text-white font-semibold hover:bg-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
       >
         Cerrar
       </button>

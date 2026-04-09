@@ -17,6 +17,7 @@ import { commonContent } from '@/lib/content';
 import { buildApplicationOptions, GENERAL_ADVISORY_OPTION } from '@/lib/applications';
 import { trackEvent, EVENTS } from '@/lib/analytics';
 import { buildWhatsAppUrl, getWhatsAppConfig } from '@/lib/contactChannels';
+import { consumeQuickQuoteHandoff } from '@/lib/quickQuoteHandoff';
 import { cn } from '@/lib/cn';
 
 type SubmitState = 'idle' | 'loading' | 'error';
@@ -70,12 +71,30 @@ export function LeadForm({ preselectedApp }: Props = {}) {
     }
   }, [searchParams, setValue]);
 
+  // Consume the handoff from the QuickQuoteModal (if present) so the visitor
+  // doesn't have to retype Nombre / WhatsApp / Email when they click
+  // "¿Quieres darnos más contexto antes de la propuesta?". The handoff is
+  // one-shot: reading it also removes it from sessionStorage.
+  useEffect(() => {
+    const handoff = consumeQuickQuoteHandoff();
+    if (!handoff) return;
+    if (handoff.firstName) setValue('firstName', handoff.firstName);
+    if (handoff.whatsapp) setValue('whatsapp', handoff.whatsapp);
+    if (handoff.email) setValue('email', handoff.email);
+    if (handoff.planInterest) setValue('planInterest', handoff.planInterest);
+  }, [setValue]);
+
   const onSubmit: SubmitHandler<LeadFormValues> = async (data) => {
     setSubmitState('loading');
-    trackEvent(EVENTS.SUBMIT_LEAD, {
+    // Analytics agent spec: include form_type + has_email on every submit*
+    // event for consistent segmentation between quick_quote and full_lead.
+    const commonProps = {
+      form_type: 'full_lead' as const,
       application_id: data.application,
       plan_interest: data.planInterest ?? null,
-    });
+      has_email: Boolean(data.email && data.email.length > 0),
+    };
+    trackEvent(EVENTS.SUBMIT_LEAD, commonProps);
     try {
       const res = await fetch('/api/leads', {
         method: 'POST',
@@ -83,13 +102,11 @@ export function LeadForm({ preselectedApp }: Props = {}) {
         body: JSON.stringify(data),
       });
       if (!res.ok) throw new Error(`Request failed: ${res.status}`);
-      trackEvent(EVENTS.SUBMIT_LEAD_SUCCESS, {
-        application_id: data.application,
-        plan_interest: data.planInterest ?? null,
-      });
+      trackEvent(EVENTS.SUBMIT_LEAD_SUCCESS, commonProps);
       router.push('/gracias');
     } catch (err) {
       trackEvent(EVENTS.SUBMIT_LEAD_ERROR, {
+        ...commonProps,
         error_type: 'network',
         error_message: err instanceof Error ? err.message : 'unknown',
       });
