@@ -2,11 +2,14 @@ name: Deploy to Heroku
 
 # Every push to main triggers this workflow, which mirrors the commit to
 # Heroku's git remote. Requires one secret in GitHub:
-#   HEROKU_API_KEY  — obtained from `heroku auth:token` on the owner's machine
-#                     (or from https://dashboard.heroku.com/account).
+#   HEROKU_API_KEY  — a dedicated authorization token created with
+#                     `heroku authorizations:create`. Do NOT reuse your
+#                     personal `heroku auth:token`.
 #
-# The Heroku build (buildpack heroku/nodejs) runs on Heroku's side, so this
-# workflow stays minimal: checkout full history, then push the ref.
+# Heroku no longer accepts HTTP basic auth on git.heroku.com, so the
+# workflow installs the Heroku CLI and lets it handle credentials via the
+# HEROKU_API_KEY env var (writes a proper ~/.netrc internally). The Heroku
+# build (buildpack heroku/nodejs) still runs on Heroku's side.
 
 on:
   push:
@@ -30,7 +33,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Push to Heroku
+      - name: Install Heroku CLI
+        run: curl https://cli-assets.heroku.com/install.sh | sh
+
+      - name: Deploy to Heroku
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
@@ -39,4 +45,14 @@ jobs:
             echo "::error::GitHub → Settings → Secrets and variables → Actions → New repository secret."
             exit 1
           fi
-          git push --force "https://heroku:${HEROKU_API_KEY}@git.heroku.com/${HEROKU_APP_NAME}.git" HEAD:main
+          cat > "$HOME/.netrc" <<EOF
+          machine api.heroku.com
+            login ci@rohu-solutions.com
+            password $HEROKU_API_KEY
+          machine git.heroku.com
+            login ci@rohu-solutions.com
+            password $HEROKU_API_KEY
+          EOF
+          chmod 600 "$HOME/.netrc"
+          heroku git:remote -a "$HEROKU_APP_NAME"
+          git push --force heroku HEAD:main
