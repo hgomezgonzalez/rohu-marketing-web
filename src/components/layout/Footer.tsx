@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { MessageCircle, Send } from 'lucide-react';
 import { BrandLogo } from '@/components/ui/BrandLogo';
 import { companyContent, commonContent } from '@/lib/content';
@@ -11,12 +12,15 @@ import {
   getTelegramUsername,
   getWhatsAppConfig,
 } from '@/lib/contactChannels';
+import { buildContextualWhatsAppMessage } from '@/lib/whatsappMessage';
 import { trackEvent, EVENTS } from '@/lib/analytics';
 
 export function Footer() {
-  const { phone, defaultMessage } = getWhatsAppConfig();
+  const { phone } = getWhatsAppConfig();
+  const pathname = usePathname();
   const telegramUsername = getTelegramUsername();
-  const waHref = phone ? buildWhatsAppUrl(phone, defaultMessage) : null;
+  const waMessage = buildContextualWhatsAppMessage(pathname);
+  const waHref = phone ? buildWhatsAppUrl(phone, waMessage) : null;
   const tgHref = telegramUsername ? buildTelegramUrl(telegramUsername) : null;
   const liveApps = getLiveApplications();
 

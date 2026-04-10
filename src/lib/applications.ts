@@ -64,6 +64,12 @@ export interface Application {
   targetAudience: string[];
   audienceClosingLine: string;
   demo?: ApplicationDemo;
+  /**
+   * Optional public preview URL. Used when the app has a hosted preview that
+   * can be opened without credentials (vs `demo` which exposes credentials).
+   * If both are set, `demo` takes precedence in the hero section.
+   */
+  previewUrl?: string;
   hero: {
     eyebrow: string;
     h1: string;
@@ -435,6 +441,332 @@ const rohuContable: Application = {
 };
 
 /**
+ * ROHU Connect — second live application in the catalog.
+ *
+ * Sold B2B white-label: ROHU Solutions licenses the marketplace platform to
+ * municipalities, chambers of commerce, cooperatives and federations who want
+ * to digitalize on-demand local services in their territory. ROHU does NOT
+ * operate the marketplace directly — clients run their own.
+ *
+ * Source code: /home/hfgomezgo/personal/rohu-connect (pnpm + Turborepo).
+ * Stack: Next.js 14 + NestJS + PostgreSQL+PostGIS + Prisma + Redis + Sentry.
+ * Public preview: https://rohu-connect-web-staging-7e1e7f374cd0.herokuapp.com/
+ */
+const rohuConnect: Application = {
+  id: 'rohu-connect',
+  slug: 'rohu-connect',
+  name: 'ROHU Connect',
+  shortName: 'Connect',
+  tagline: 'Plataforma marketplace on-demand para servicios locales',
+  description:
+    'Lanza tu propio marketplace on-demand local en semanas. Conecta a personas que necesitan un servicio con proveedores cercanos por geolocalización, rankings y reseñas, con pagos y comisiones integrados.',
+  status: 'live',
+  iconName: 'Waypoints',
+  accentColor: 'accent',
+  previewUrl: 'https://rohu-connect-web-staging-7e1e7f374cd0.herokuapp.com/',
+  targetAudience: [
+    'Alcaldías y gobiernos municipales',
+    'Cámaras de comercio sectoriales',
+    'Cooperativas de servicios',
+    'Federaciones y gremios',
+    'Conjuntos residenciales y clubes',
+    'Operadores turísticos regionales',
+  ],
+  audienceClosingLine:
+    'Si quieres digitalizar los servicios locales de tu territorio con proveedores cercanos verificados por ti, ROHU Connect es tu plataforma.',
+  hero: {
+    eyebrow: 'ROHU Connect · Plataforma marketplace',
+    h1: 'Tu propio marketplace on-demand local, listo en semanas',
+    subheadline:
+      'La infraestructura tecnológica para conectar a vecinos con proveedores de servicios cercanos en tu territorio. Geolocalización, rankings, reseñas y pagos integrados.',
+  },
+  benefits: {
+    eyebrow: 'Beneficios',
+    sectionTitle: 'La infraestructura completa de un marketplace local',
+    sectionSubtitle:
+      'Todo lo que necesitas para operar un marketplace de servicios on-demand sin construir nada desde cero.',
+    cards: [
+      {
+        id: 'time_to_market',
+        title: 'Lanzas en semanas',
+        description: 'Configuración por categorías y zonas en tiempo récord, no en años de desarrollo.',
+        icon: 'Rocket',
+      },
+      {
+        id: 'geo_matching',
+        title: 'Búsqueda por cercanía',
+        description: 'Match geoespacial con PostGIS por distancia, calificación y disponibilidad real.',
+        icon: 'MapPin',
+      },
+      {
+        id: 'verified_providers',
+        title: 'Proveedores con perfil',
+        description: 'Cada proveedor pasa por tu proceso de verificación antes de aparecer en la plataforma.',
+        icon: 'BadgeCheck',
+      },
+      {
+        id: 'ratings_reviews',
+        title: 'Reseñas y calificaciones',
+        description: 'Reputación visible para el cliente, retroalimentación para el proveedor.',
+        icon: 'Star',
+      },
+      {
+        id: 'commissions',
+        title: 'Comisiones configurables',
+        description: 'Define tu modelo de cobro y la plataforma calcula comisiones por transacción.',
+        icon: 'Percent',
+      },
+      {
+        id: 'notifications',
+        title: 'Notificaciones multicanal',
+        description: 'Email, SMS y push integrados desde el primer día con plantillas listas.',
+        icon: 'Bell',
+      },
+      {
+        id: 'compliance',
+        title: 'Cumplimiento local',
+        description: 'Trazabilidad, datos cifrados y alineación con la Ley 1581 de Habeas Data.',
+        icon: 'ShieldCheck',
+      },
+    ],
+  },
+  howItWorks: {
+    eyebrow: 'Cómo trabajamos contigo',
+    sectionTitle: 'De la idea al lanzamiento en cuatro pasos',
+    sectionSubtitle:
+      'Acompañamos a tu equipo desde el diagnóstico inicial hasta el primer mes en producción.',
+    steps: [
+      {
+        number: 1,
+        title: 'Diagnóstico del territorio',
+        description:
+          'Entendemos tu sector, las categorías de servicio prioritarias y el volumen esperado de usuarios.',
+        hint: 'Sin compromiso, en una sola sesión de descubrimiento.',
+      },
+      {
+        number: 2,
+        title: 'Configuración a tu medida',
+        description:
+          'Configuramos categorías, zonas, comisiones y reglas de matching según tu modelo operativo.',
+        hint: 'Tu equipo ve y aprueba cada decisión antes de pasar a producción.',
+      },
+      {
+        number: 3,
+        title: 'Capacitación de proveedores piloto',
+        description:
+          'Ayudamos a registrar y verificar el primer grupo de proveedores con sesiones grupales.',
+        hint: 'Empezamos pequeño y crecemos cuando las primeras transacciones validen el modelo.',
+      },
+      {
+        number: 4,
+        title: 'Lanzamiento y acompañamiento',
+        description:
+          'Te acompañamos durante el lanzamiento y los primeros meses con soporte y mejoras continuas.',
+        hint: 'Nunca quedas solo con la plataforma encendida.',
+      },
+    ],
+  },
+  modules: {
+    eyebrow: 'Módulos',
+    sectionTitle: 'Doce módulos que componen la plataforma',
+    sectionSubtitle:
+      'Construidos sobre Next.js, NestJS y PostgreSQL con PostGIS — listos para producción.',
+    items: [
+      { id: 'identity', label: 'Identidad y acceso', description: 'Registro, login y roles con cifrado de datos sensibles.', icon: 'KeyRound' },
+      { id: 'geo_matching', label: 'Búsqueda por cercanía', description: 'Match geoespacial por distancia, rating y disponibilidad.', icon: 'MapPin' },
+      { id: 'requests', label: 'Solicitudes', description: 'Flujo completo de pedidos: pendiente, asignado, completado.', icon: 'ClipboardList' },
+      { id: 'profiles', label: 'Perfiles y verificación', description: 'Catálogo de proveedores con datos, fotos y validación.', icon: 'BadgeCheck' },
+      { id: 'booking', label: 'Reservas y agenda', description: 'Reservas con anti-doble-booking automático en horario.', icon: 'CalendarClock' },
+      { id: 'reviews', label: 'Calificaciones', description: 'Reseñas con promedio visible para clientes y proveedores.', icon: 'Star' },
+      { id: 'commissions', label: 'Comisiones', description: 'Cálculo automático por transacción según tu modelo.', icon: 'Percent' },
+      { id: 'notifications', label: 'Notificaciones', description: 'Email, SMS, push e in-app con cola de reintentos.', icon: 'Bell' },
+      { id: 'admin', label: 'Panel administrativo', description: 'Gestión de proveedores, disputas y operación diaria.', icon: 'LayoutDashboard' },
+      { id: 'audit', label: 'Trazabilidad', description: 'Registro auditable de cada acción importante en la plataforma.', icon: 'ScrollText' },
+      { id: 'i18n', label: 'Multi-idioma', description: 'Interfaz preparada para varios idiomas con next-intl.', icon: 'Languages' },
+      { id: 'realtime', label: 'Cola en tiempo real', description: 'Procesamiento asíncrono con Redis y BullMQ.', icon: 'Zap' },
+    ],
+  },
+  pricing: {
+    eyebrow: 'Planes y precios',
+    sectionTitle: 'Elige el alcance que se ajusta a tu territorio',
+    sectionSubtitle:
+      'Tres tiers pensados para diferentes tamaños de operación. Todos incluyen acompañamiento de implementación.',
+    tiers: [
+      {
+        id: 'municipio',
+        name: 'Municipio',
+        tagline: 'Para empezar en una ciudad',
+        isPopular: false,
+        targetAudience:
+          'Ideal para municipios pequeños o cooperativas que quieren validar el modelo en una sola categoría.',
+        features: [
+          'Hasta 100 proveedores activos',
+          '1 categoría de servicio',
+          'Hasta 500 transacciones / mes',
+          'Comisión fija por transacción',
+          '1 zona geográfica',
+          'Soporte por email',
+          'Capacitación inicial guiada',
+        ],
+        highlightedFeatures: ['1 categoría', '100 proveedores', 'Soporte por email'],
+        ctaLabel: 'Pedir propuesta',
+        billingNote: 'Configuración inicial incluida · sin permanencia',
+      },
+      {
+        id: 'metropolitana',
+        name: 'Área metropolitana',
+        tagline: 'Para territorios en expansión',
+        isPopular: true,
+        popularLabel: 'Más popular',
+        targetAudience:
+          'Para alcaldías de ciudades intermedias, cámaras de comercio y federaciones con varios sectores.',
+        features: [
+          'Hasta 1.000 proveedores activos',
+          'Categorías ilimitadas',
+          'Hasta 10.000 transacciones / mes',
+          'Comisión configurable por categoría',
+          'Hasta 3 zonas geográficas',
+          'Soporte prioritario por chat',
+          'Capacitación extendida y reportes',
+        ],
+        highlightedFeatures: ['Categorías ilimitadas', '1.000 proveedores', 'Comisión configurable'],
+        ctaLabel: 'Pedir propuesta',
+        billingNote: 'Implementación guiada de 4 a 8 semanas',
+      },
+      {
+        id: 'enterprise',
+        name: 'Enterprise',
+        tagline: 'A la medida de tu organización',
+        isPopular: false,
+        targetAudience:
+          'Para grandes ciudades, redes nacionales y organizaciones que necesitan marca propia e integraciones.',
+        features: [
+          'Proveedores y transacciones ilimitados',
+          'Marca propia (white-label) end-to-end',
+          'API de lectura y escritura',
+          'Zonas geográficas ilimitadas',
+          'Integraciones a la medida',
+          'Contacto dedicado y SLA reforzado',
+          'Implementación personalizada',
+        ],
+        highlightedFeatures: ['White-label completo', 'API R+W', 'Contacto dedicado'],
+        ctaLabel: 'Pedir propuesta',
+        billingNote: 'Condiciones a la medida · alcance regional o nacional',
+      },
+    ],
+  },
+  socialProof: {
+    eyebrow: 'Testimonios',
+    sectionTitle: 'Lo que dicen las organizaciones que ya operan con ROHU Connect',
+    disclaimer:
+      'Los siguientes testimonios son ilustrativos y no corresponden a clientes reales identificados.',
+    testimonials: [
+      {
+        id: 'ct1',
+        quote:
+          'Necesitábamos digitalizar los servicios del municipio y pensábamos construirlo desde cero. ROHU Connect nos ahorró meses de desarrollo.',
+        name: 'Laura V.',
+        role: 'Directora de innovación',
+        business: 'Alcaldía municipal · Cundinamarca',
+      },
+      {
+        id: 'ct2',
+        quote:
+          'La verificación de proveedores la manejamos nosotros directamente desde el panel. Eso nos da control y transparencia para nuestros agremiados.',
+        name: 'Andrés B.',
+        role: 'Gerente de proyectos',
+        business: 'Cámara de comercio sectorial',
+      },
+      {
+        id: 'ct3',
+        quote:
+          'El equipo de ROHU acompañó cada decisión, desde las categorías hasta el modelo de comisiones. Lanzamos con seguridad.',
+        name: 'Marcela T.',
+        role: 'Coordinadora operativa',
+        business: 'Cooperativa de servicios · Antioquia',
+      },
+    ],
+  },
+  faqs: {
+    eyebrow: 'Preguntas frecuentes',
+    sectionTitle: '¿Listo para entender la plataforma a fondo?',
+    sectionSubtitle:
+      'Las respuestas que más nos piden las organizaciones interesadas en lanzar su marketplace.',
+    items: [
+      {
+        id: 'vs_build',
+        question: '¿Qué diferencia a ROHU Connect de construir nuestro propio marketplace?',
+        answer:
+          'Tiempo y costo. ROHU Connect ya tiene los componentes complejos resueltos: matching geoespacial, reservas anti-doble-booking, notificaciones y trazabilidad. Tu equipo se concentra en la operación local, no en construir software.',
+      },
+      {
+        id: 'time',
+        question: '¿Cuánto tarda la implementación?',
+        answer:
+          'Entre 4 y 8 semanas, según el tamaño del territorio, la cantidad de categorías y la complejidad de la verificación inicial de proveedores.',
+      },
+      {
+        id: 'categories',
+        question: '¿Qué categorías de servicio podemos ofrecer?',
+        answer:
+          'Las que decidas. La plataforma soporta cualquier servicio local que pueda reservarse: cerrajería, limpieza, manicura, mecánica, mantenimiento del hogar, salud preventiva, entre otros.',
+      },
+      {
+        id: 'verification',
+        question: '¿Cómo se verifican los proveedores?',
+        answer:
+          'Tu equipo define el proceso de verificación. La plataforma te entrega las herramientas (perfiles, documentos, estado de aprobación) y tu organización valida cada proveedor antes de activarlo.',
+      },
+      {
+        id: 'payments',
+        question: '¿Cómo se manejan los pagos y las comisiones?',
+        answer:
+          'En el MVP las comisiones se calculan automáticamente y se reportan. La integración con pasarelas de pago colombianas (Wompi, PayU) está en la hoja de ruta de la versión 1.',
+      },
+      {
+        id: 'territory',
+        question: '¿Tenemos control sobre el territorio y las zonas de cobertura?',
+        answer:
+          'Sí. Tú defines las zonas geográficas, los radios de cobertura por categoría y las reglas de asignación. Todo configurable desde el panel administrativo.',
+      },
+      {
+        id: 'white_label',
+        question: '¿Podemos usar nuestra propia marca?',
+        answer:
+          'Sí, en el plan Enterprise. La plataforma se entrega con tu marca, dominio y colores. Los planes Municipio y Área metropolitana mantienen co-branding con ROHU Connect.',
+      },
+      {
+        id: 'disputes',
+        question: '¿Qué pasa con las disputas entre cliente y proveedor?',
+        answer:
+          'Tu equipo administrativo gestiona las disputas desde el panel de la plataforma. ROHU Solutions provee la infraestructura tecnológica y las herramientas, pero la mediación es responsabilidad de quien opera el marketplace.',
+      },
+      {
+        id: 'mobile',
+        question: '¿Hay app móvil nativa?',
+        answer:
+          'Por ahora la plataforma es una PWA mobile-first instalable desde el navegador. Las apps nativas para iOS y Android están planeadas en la versión 1 del producto.',
+      },
+      {
+        id: 'integrations',
+        question: '¿Cómo se integra con nuestros sistemas actuales?',
+        answer:
+          'Los planes Área metropolitana y Enterprise incluyen acceso a la API. En Enterprise también ofrecemos integraciones a la medida según tus sistemas existentes.',
+      },
+    ],
+  },
+  ctaFinal: {
+    eyebrow: 'Hablemos de tu marketplace',
+    sectionTitle: '¿Listo para lanzar tu plataforma de servicios?',
+    body:
+      'Cuéntanos sobre tu organización, el territorio que quieres cubrir y las categorías de servicio que tienes en mente. Te respondemos con una propuesta a tu medida.',
+  },
+  metaTitle: 'ROHU Connect — Plataforma marketplace on-demand white-label',
+  metaDescription:
+    'Lanza tu propio marketplace on-demand local en semanas. Geolocalización, rankings, reseñas y pagos integrados. Para alcaldías, cámaras de comercio, cooperativas y federaciones.',
+};
+
+/**
  * Placeholder apps (coming_soon) — these are visible in the home grid so the
  * visitor sees the catalog vision, but their pages are not generated until
  * status is flipped to 'live' and the content is filled in.
@@ -534,7 +866,7 @@ const comingSoonApps: Application[] = [
   },
 ];
 
-export const applications: Application[] = [rohuContable, ...comingSoonApps];
+export const applications: Application[] = [rohuContable, rohuConnect, ...comingSoonApps];
 
 export function getApplicationBySlug(slug: string): Application | undefined {
   return applications.find((a) => a.slug === slug);

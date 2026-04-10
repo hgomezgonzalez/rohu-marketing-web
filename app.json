@@ -27,11 +27,11 @@
     },
     "NEXT_PUBLIC_WHATSAPP_PHONE": {
       "description": "Owner WhatsApp phone in E.164 without the leading +",
-      "value": "57300XXXXXXX"
+      "value": "573168343318"
     },
     "NEXT_PUBLIC_WHATSAPP_DEFAULT_MESSAGE": {
-      "description": "Pre-filled WhatsApp message",
-      "value": "Hola, me interesa ROHU Solutions y quiero más información."
+      "description": "Fallback WhatsApp message — the actual message is contextual per page via buildContextualWhatsAppMessage()",
+      "value": "Hola, me interesa ROHU Solutions y quisiera más información, ¿en qué pueden ayudarme?"
     },
     "NEXT_PUBLIC_TELEGRAM_USERNAME": {
       "description": "Optional public Telegram username (without @)",
