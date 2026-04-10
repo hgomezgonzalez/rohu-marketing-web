@@ -3,21 +3,29 @@ import { applications } from '@/lib/applications';
 /**
  * Context-aware WhatsApp pre-filled message.
  *
- * Different site pages pre-fill the WhatsApp button with different messages
- * so that when the owner receives the incoming chat, they already know which
- * page (and which application, if any) triggered the conversation.
+ * The exact wording of every message in this file was reviewed and APPROVED
+ * by the rohu-legal-compliance-co agent. Each message:
+ *  - Does not promise a response time (no "respondemos en X horas").
+ *  - Does not assert any feature, price or coverage.
+ *  - Ends with an open question to invite reply, never with a closing assertion.
+ *  - Is short enough to be readable inside the WhatsApp preview.
  *
- * The message is rebuilt on every click based on the current pathname, so
- * switching between /productos/rohu-contable and /productos/rohu-connect
- * updates the message automatically without any prop drilling.
- *
- * Legal-safe: none of these messages promises response time, price or
- * guaranteed outcomes. Each ends with an open question to invite reply.
+ * Adding a new live application to the registry automatically gives it a
+ * generic per-app message via the fallback in buildContextualWhatsAppMessage.
+ * For per-app custom wording, add a case to APP_MESSAGES below.
  */
 
-/** Fallback used on the corporate home and on any non-product route. */
+/** Used on the corporate home and any non-product route. */
 const CORPORATE_MESSAGE =
-  'Hola, me interesa ROHU Solutions y quisiera más información, ¿en qué pueden ayudarme?';
+  'Hola, vi ROHU Solutions y quiero saber cómo puede ayudar a mi empresa. ¿Me cuentan más?';
+
+/** Per-app custom messages, keyed by application slug. */
+const APP_MESSAGES: Record<string, string> = {
+  'rohu-contable':
+    'Hola, estoy viendo ROHU Contable. ¿Cómo funciona para mi negocio y cuáles son los planes?',
+  'rohu-connect':
+    'Hola, me interesa ROHU Connect para mi entidad. ¿Tienen cobertura en mi territorio y cómo arrancamos?',
+};
 
 export function buildContextualWhatsAppMessage(pathname: string | null | undefined): string {
   if (!pathname) return CORPORATE_MESSAGE;
@@ -26,9 +34,12 @@ export function buildContextualWhatsAppMessage(pathname: string | null | undefin
   const productosMatch = pathname.match(/^\/productos\/([^/?#]+)/);
   if (productosMatch) {
     const slug = productosMatch[1];
+    if (slug && APP_MESSAGES[slug]) return APP_MESSAGES[slug];
+
+    // Fallback for live apps without a custom message
     const app = applications.find((a) => a.slug === slug);
     if (app) {
-      return `Hola, me interesa ${app.name} y quisiera más información, ¿en qué pueden ayudarme?`;
+      return `Hola, vi ${app.name} y me gustaría conocer más. ¿Por dónde podemos empezar?`;
     }
   }
 

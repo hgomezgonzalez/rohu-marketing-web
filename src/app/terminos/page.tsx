@@ -103,6 +103,23 @@ export default function TermsPage() {
             </p>
           </section>
 
+          <section>
+            <h2 className="text-2xl font-bold">
+              10. Naturaleza de Intermediación y Limitación de Responsabilidad en ROHU Connect
+            </h2>
+            <p className="mt-3 text-brand-muted">
+              ROHU Solutions actúa exclusivamente como proveedor de infraestructura tecnológica de
+              intermediación (Art. 10, Ley 1480/2011). Los servicios prestados a través de la
+              plataforma ROHU Connect (cerrajería, limpieza, mantenimiento y demás oficios) son
+              prestados directamente por proveedores independientes, quienes ostentan la condición
+              de proveedores del servicio final en los términos del Art. 45 de la Ley 1480/2011 y
+              sobre quienes recae la responsabilidad por la calidad, oportunidad y seguridad de su
+              prestación. ROHU Solutions no garantiza resultado, calidad ni disponibilidad de los
+              proveedores. Los datos personales de clientes y proveedores son tratados conforme a la
+              Ley 1581/2012 y la Política de Privacidad vigente.
+            </p>
+          </section>
+
           <div className="mt-6 rounded-brand-md border border-warning/40 bg-warning/5 p-4 text-xs text-brand-text">
             <strong>Nota importante:</strong> este documento es un esqueleto inicial y no reemplaza
             la revisión por parte de un abogado habilitado en Colombia antes de su publicación

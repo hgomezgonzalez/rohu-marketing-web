@@ -457,12 +457,12 @@ const rohuConnect: Application = {
   slug: 'rohu-connect',
   name: 'ROHU Connect',
   shortName: 'Connect',
-  tagline: 'Plataforma marketplace on-demand para servicios locales',
+  tagline: 'Tu marketplace de servicios, en producción en 90 días',
   description:
-    'Lanza tu propio marketplace on-demand local en semanas. Conecta a personas que necesitan un servicio con proveedores cercanos por geolocalización, rankings y reseñas, con pagos y comisiones integrados.',
+    'Plataforma white-label que ayuda a alcaldías, cámaras, cooperativas y federaciones a ofrecer un marketplace de servicios locales bajo su propia marca, con control total del territorio. Sin construir tecnología desde cero.',
   status: 'live',
-  iconName: 'Waypoints',
-  accentColor: 'accent',
+  iconName: 'Handshake',
+  accentColor: 'secondary',
   previewUrl: 'https://rohu-connect-web-staging-7e1e7f374cd0.herokuapp.com/',
   targetAudience: [
     'Alcaldías y gobiernos municipales',

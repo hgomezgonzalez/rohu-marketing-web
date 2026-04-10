@@ -82,6 +82,88 @@ export default function ApplicationPage({ params }: Params) {
     },
   };
 
+  // Section nodes — built once and reordered per-app below.
+  // The funnel-designer agent flagged that B2B complex products (ROHU Connect)
+  // need a different reading order than B2B-SMB products (ROHU Contable):
+  // visitors must understand the model BEFORE the benefits make sense.
+  const sectionAudienceTitle =
+    app.id === 'rohu-connect'
+      ? 'Diseñado para entidades como la tuya'
+      : 'Diseñado para comercios como el tuyo';
+
+  const Benefits = (
+    <BenefitsSection
+      key="benefits"
+      eyebrow={app.benefits.eyebrow}
+      title={app.benefits.sectionTitle}
+      subtitle={app.benefits.sectionSubtitle}
+      cards={app.benefits.cards}
+    />
+  );
+  const Audience = (
+    <AudienceSection
+      key="audience"
+      eyebrow="Para quién es"
+      title={sectionAudienceTitle}
+      chips={app.targetAudience}
+      closingLine={app.audienceClosingLine}
+    />
+  );
+  const HowItWorks = (
+    <HowItWorksSection
+      key="how"
+      eyebrow={app.howItWorks.eyebrow}
+      title={app.howItWorks.sectionTitle}
+      subtitle={app.howItWorks.sectionSubtitle}
+      steps={app.howItWorks.steps}
+    />
+  );
+  const Modules = (
+    <ModulesGridSection
+      key="modules"
+      eyebrow={app.modules.eyebrow}
+      title={app.modules.sectionTitle}
+      subtitle={app.modules.sectionSubtitle}
+      items={app.modules.items}
+    />
+  );
+  const Pricing = (
+    <PricingSection
+      key="pricing"
+      eyebrow={app.pricing.eyebrow}
+      title={app.pricing.sectionTitle}
+      subtitle={app.pricing.sectionSubtitle}
+      tiers={app.pricing.tiers}
+      applicationId={app.id}
+    />
+  );
+  const SocialProof = (
+    <SocialProofSection
+      key="testimonials"
+      eyebrow={app.socialProof.eyebrow}
+      title={app.socialProof.sectionTitle}
+      disclaimer={app.socialProof.disclaimer}
+      testimonials={app.socialProof.testimonials}
+      pending={!FEATURE_FLAGS.TESTIMONIALS_PUBLISHED}
+    />
+  );
+  const Faq = (
+    <FaqSection
+      key="faqs"
+      eyebrow={app.faqs.eyebrow}
+      title={app.faqs.sectionTitle}
+      subtitle={app.faqs.sectionSubtitle}
+      items={app.faqs.items}
+    />
+  );
+
+  // ROHU Connect (B2B complex) order: HowItWorks → Audience → Benefits → ...
+  // ROHU Contable (B2B SMB) keeps: Benefits → Audience → HowItWorks → ...
+  const orderedSections =
+    app.id === 'rohu-connect'
+      ? [HowItWorks, Audience, Benefits, Modules, Pricing, SocialProof, Faq]
+      : [Benefits, Audience, HowItWorks, Modules, Pricing, SocialProof, Faq];
+
   return (
     <>
       <script
@@ -91,50 +173,7 @@ export default function ApplicationPage({ params }: Params) {
       <ApplicationViewTracker applicationId={app.id} />
       <ApplicationHeroSection app={app} />
       <InPageNavigation items={DEFAULT_APP_NAV_ITEMS} applicationId={app.id} />
-      <BenefitsSection
-        eyebrow={app.benefits.eyebrow}
-        title={app.benefits.sectionTitle}
-        subtitle={app.benefits.sectionSubtitle}
-        cards={app.benefits.cards}
-      />
-      <AudienceSection
-        eyebrow="Para quién es"
-        title="Diseñado para comercios como el tuyo"
-        chips={app.targetAudience}
-        closingLine={app.audienceClosingLine}
-      />
-      <HowItWorksSection
-        eyebrow={app.howItWorks.eyebrow}
-        title={app.howItWorks.sectionTitle}
-        subtitle={app.howItWorks.sectionSubtitle}
-        steps={app.howItWorks.steps}
-      />
-      <ModulesGridSection
-        eyebrow={app.modules.eyebrow}
-        title={app.modules.sectionTitle}
-        subtitle={app.modules.sectionSubtitle}
-        items={app.modules.items}
-      />
-      <PricingSection
-        eyebrow={app.pricing.eyebrow}
-        title={app.pricing.sectionTitle}
-        subtitle={app.pricing.sectionSubtitle}
-        tiers={app.pricing.tiers}
-        applicationId={app.id}
-      />
-      <SocialProofSection
-        eyebrow={app.socialProof.eyebrow}
-        title={app.socialProof.sectionTitle}
-        disclaimer={app.socialProof.disclaimer}
-        testimonials={app.socialProof.testimonials}
-        pending={!FEATURE_FLAGS.TESTIMONIALS_PUBLISHED}
-      />
-      <FaqSection
-        eyebrow={app.faqs.eyebrow}
-        title={app.faqs.sectionTitle}
-        subtitle={app.faqs.sectionSubtitle}
-        items={app.faqs.items}
-      />
+      {orderedSections}
       <Suspense fallback={null}>
         <CtaSection
           eyebrow={app.ctaFinal.eyebrow}
