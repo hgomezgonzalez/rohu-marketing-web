@@ -65,6 +65,18 @@ export function ChatWidget() {
   const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
+  // Timestamp of the last handleOpen() call. Used to suppress the iOS
+  // "tap ghost" — a click event that sometimes fires on the freshly
+  // mounted panel DOM node from the same physical tap that triggered
+  // the FAB. We ignore any pointer event hitting the panel within the
+  // first 350 ms of it opening.
+  const openedAtMsRef = useRef<number>(0);
+  // True once the visitor has sent at least one message in this widget
+  // lifetime. Before that, there is no session on the server, so the
+  // poll endpoint would return 410 Gone → the client would interpret
+  // it as "dyno restarted" and show the maintenance message. So we
+  // intentionally do NOT poll until this flag flips to true.
+  const hasConversationRef = useRef<boolean>(false);
 
   // SSR safety: only render the portal after mount
   useEffect(() => {
@@ -111,9 +123,10 @@ export function ChatWidget() {
     );
   }, [stopPolling]);
 
-  // Visibility API: pause polling when tab is hidden
+  // Visibility API: pause polling when tab is hidden. Skip entirely if
+  // there is no active conversation yet (nothing to poll for).
   useEffect(() => {
-    if (!open || restarted) return;
+    if (!open || restarted || !hasConversationRef.current) return;
     const onVisibility = () => {
       if (document.hidden) {
         stopPolling();
@@ -125,39 +138,50 @@ export function ChatWidget() {
     return () => document.removeEventListener('visibilitychange', onVisibility);
   }, [open, restarted, startLivePoll, stopPolling]);
 
-  // Start / stop polling as open toggles
+  // Start / stop polling as `open` toggles. CRITICAL: we only start the
+  // poll loop if the visitor has already sent at least one message this
+  // lifetime (hasConversationRef.current === true). Before that, there
+  // is no session on the server and /api/chat/poll would respond 410
+  // Gone, which the client interprets as "session restarted" — i.e. the
+  // maintenance modal would appear on every first open. Instead, the
+  // polling is kicked off inside handleSend() after the first successful
+  // send (see below).
   useEffect(() => {
     if (!open) {
       stopPolling();
       return;
     }
     if (restarted) return;
+    if (!hasConversationRef.current) return;
     startLivePoll();
     return () => stopPolling();
   }, [open, restarted, startLivePoll, stopPolling]);
 
-  // Focus input when opening
+  // Focus input when opening — DESKTOP ONLY. On mobile, auto-focus opens
+  // the soft keyboard which resizes the viewport and can cause iOS Safari
+  // to reflow the fixed panel, sometimes racing with the tap-ghost event
+  // flow and closing the widget. The user can tap the textarea manually
+  // on mobile without any UX cost.
   useEffect(() => {
-    if (open && inputRef.current) {
-      const t = setTimeout(() => inputRef.current?.focus(), 120);
-      return () => clearTimeout(t);
-    }
+    if (!open || !inputRef.current) return;
+    if (typeof window === 'undefined') return;
+    const isCoarse = window.matchMedia('(pointer: coarse)').matches;
+    if (isCoarse) return; // touch device → skip auto-focus
+    const t = setTimeout(() => inputRef.current?.focus(), 120);
+    return () => clearTimeout(t);
   }, [open]);
 
-  // Escape closes
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') handleClose();
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  // NOTE: No global Escape listener. Some mobile browsers (Android back
+  // button, virtual-keyboard dismiss gestures) dispatch synthetic
+  // `keydown` events with `key === 'Escape'`, which was causing the
+  // widget to close the moment it opened. The only way to close is now
+  // the explicit X button in the header.
 
   const handleOpen = useCallback(() => {
+    const now = Date.now();
     setOpen(true);
-    openedAtRef.current = Date.now();
+    openedAtRef.current = now;
+    openedAtMsRef.current = now;
     trackEvent(EVENTS.OPEN_CHAT_WIDGET, { pathname });
   }, [pathname]);
 
@@ -177,12 +201,17 @@ export function ChatWidget() {
     }
     lastSeenTsRef.current = 0;
     visitorMessageCountRef.current = 0;
+    hasConversationRef.current = false;
     setMessages([]);
     setRestarted(false);
     setLeadCardVisible(false);
-    startLivePoll();
-    inputRef.current?.focus();
-  }, [startLivePoll]);
+    // Do NOT start polling here — it will start when the visitor sends
+    // their first message in the new session (same rule as on initial open).
+    const isCoarse =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(pointer: coarse)').matches;
+    if (!isCoarse) inputRef.current?.focus();
+  }, []);
 
   const scheduleIdleHint = useCallback(() => {
     if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
@@ -256,6 +285,16 @@ export function ChatWidget() {
         )
       );
       visitorMessageCountRef.current += 1;
+
+      // First successful send creates the server-side session. Only now
+      // does it make sense to start polling for admin replies — before
+      // this point, the poll endpoint would 410 and trigger the
+      // "restarted" modal on every fresh widget open.
+      if (!hasConversationRef.current) {
+        hasConversationRef.current = true;
+        startLivePoll();
+      }
+
       scheduleIdleHint();
       maybeShowLeadCard();
     },
@@ -263,6 +302,7 @@ export function ChatWidget() {
       sending,
       draft,
       pathname,
+      startLivePoll,
       scheduleIdleHint,
       maybeShowLeadCard,
     ]
@@ -285,11 +325,29 @@ export function ChatWidget() {
 
   const portalTarget = document.body;
 
-  const fab = !open && (
+  // Tap-ghost suppression: any pointer/click on the panel within the
+  // first 350 ms of opening is the same physical tap that opened the
+  // FAB. iOS Safari batches touch events and sometimes delivers a
+  // trailing click to whatever DOM node sits at the tap coordinates
+  // after the FAB disappears — which is our panel. Swallow those.
+  const tapGuard = (e: React.SyntheticEvent) => {
+    if (Date.now() - openedAtMsRef.current < 350) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
+
+  const fab = (
     <button
       type="button"
       onClick={handleOpen}
       aria-label={chatCopy.fabAriaLabel}
+      aria-hidden={open ? 'true' : 'false'}
+      tabIndex={open ? -1 : 0}
+      style={{
+        visibility: open ? 'hidden' : 'visible',
+        pointerEvents: open ? 'none' : 'auto',
+      }}
       className="
         fixed bottom-5 right-5 z-40
         inline-flex items-center gap-2
@@ -307,23 +365,30 @@ export function ChatWidget() {
     </button>
   );
 
-  const panel = open && (
+  const panel = (
     <div
       ref={panelRef}
       role="dialog"
-      aria-modal="false"
+      aria-modal="true"
       aria-label={chatCopy.headerTitle}
+      aria-hidden={open ? 'false' : 'true'}
+      onClickCapture={tapGuard}
+      onTouchStartCapture={tapGuard}
+      onPointerDownCapture={tapGuard}
+      style={{
+        visibility: open ? 'visible' : 'hidden',
+        pointerEvents: open ? 'auto' : 'none',
+      }}
       className="
         fixed z-50
         bottom-0 right-0 left-0
         sm:bottom-6 sm:right-6 sm:left-auto
         sm:w-[380px] sm:max-w-[calc(100vw-3rem)]
-        h-[85vh] sm:h-[560px] sm:max-h-[calc(100vh-3rem)]
+        h-[85dvh] sm:h-[560px] sm:max-h-[calc(100vh-3rem)]
         flex flex-col
         bg-white shadow-elevated
         sm:rounded-brand-lg
         overflow-hidden
-        animate-fade-in-up
       "
     >
       {/* Header */}
