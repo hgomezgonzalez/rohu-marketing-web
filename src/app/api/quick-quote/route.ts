@@ -79,6 +79,12 @@ export async function POST(req: NextRequest) {
     formType: 'quick_quote',
   };
 
+  // Structured log so every captured lead survives on Heroku Logs even if
+  // Telegram/SMTP/CRM integrations are unconfigured or fail. Grep with:
+  //   heroku logs -a rohu-marketing-web --tail | grep lead:captured
+  // eslint-disable-next-line no-console
+  console.info('[lead:captured]', JSON.stringify(lead));
+
   try {
     await appendLead(lead);
   } catch (err) {
