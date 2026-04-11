@@ -103,6 +103,12 @@ type TelegramInlineKeyboard = {
 };
 
 function buildInlineKeyboard(lead: Lead): TelegramInlineKeyboard {
+  // The Telegram Bot API only accepts http(s):// and tg:// URLs for inline
+  // keyboard buttons. `mailto:` is explicitly rejected with
+  // BUTTON_URL_INVALID, which drops the entire message — not just the
+  // button. So we only expose the WhatsApp CTA here; the lead email is
+  // already rendered inside the message body where Telegram auto-linkifies
+  // it on mobile (tapping it opens the native mail client anyway).
   const row: Array<{ text: string; url: string }> = [];
   const cleanedWhatsapp = lead.whatsapp.replace(/\D/g, '');
   if (cleanedWhatsapp.length >= 10) {
@@ -112,12 +118,6 @@ function buildInlineKeyboard(lead: Lead): TelegramInlineKeyboard {
     row.push({
       text: '📲 Responder por WhatsApp',
       url: buildWhatsAppUrl(e164, greeting),
-    });
-  }
-  if (lead.email) {
-    row.push({
-      text: '✉️ Abrir email',
-      url: `mailto:${lead.email}`,
     });
   }
   return { inline_keyboard: row.length > 0 ? [row] : [] };
