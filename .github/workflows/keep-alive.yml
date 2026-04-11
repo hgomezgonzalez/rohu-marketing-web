@@ -1,0 +1,36 @@
+name: Keep-alive dyno
+
+# Pings /api/health every 25 minutes during business hours (Colombia
+# timezone, Mon-Sat 07:00-21:00) so the Heroku eco dyno stays warm and
+# the Telegram webhook doesn't pay a ~5s cold-start on every admin reply.
+# Bogota is UTC-5, so the cron expression below is in UTC.
+#
+# 07:00-21:00 Bogota == 12:00-02:00 UTC. We split the range in two cron
+# entries so the workflow runs back-to-back across midnight UTC.
+#
+# The job requires no secrets: /api/health is public and idempotent.
+
+on:
+  schedule:
+    - cron: '*/25 12-23 * * 1-6'   # 07:00-18:55 Bogota (Mon-Sat)
+    - cron: '*/25 0-1 * * 2-6'     # 19:00-20:55 Bogota (rolls over to Tue-Sun UTC)
+  workflow_dispatch:
+
+concurrency:
+  group: keep-alive
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    name: Ping /api/health
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Curl health endpoint
+        run: |
+          set -e
+          echo "Pinging https://rohu-solutions.com/api/health"
+          curl -sS -f -o /tmp/health.json -w "HTTP %{http_code} in %{time_total}s\n" \
+            https://rohu-solutions.com/api/health
+          cat /tmp/health.json | head -c 1000
+          echo ""

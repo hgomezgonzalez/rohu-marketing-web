@@ -1,5 +1,6 @@
 import type { Lead } from '@/types/lead';
 import { buildWhatsAppUrl } from './contactChannels';
+import { escapeHtml } from './htmlEscape';
 
 /**
  * Server-only helper that pushes a formatted lead notification to the owner
@@ -44,19 +45,6 @@ export async function notifyTelegram(lead: Lead): Promise<void> {
     // eslint-disable-next-line no-console
     console.error('[notifyTelegram] fetch failed', err);
   }
-}
-
-function escapeHtml(raw: string): string {
-  return raw.replace(/[&<>"']/g, (ch) => {
-    switch (ch) {
-      case '&': return '&amp;';
-      case '<': return '&lt;';
-      case '>': return '&gt;';
-      case '"': return '&quot;';
-      case "'": return '&#39;';
-      default: return ch;
-    }
-  });
 }
 
 function buildMessageText(lead: Lead): string {

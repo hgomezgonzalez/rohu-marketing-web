@@ -38,11 +38,16 @@
       "required": false
     },
     "TELEGRAM_BOT_TOKEN": {
-      "description": "Server-only token of the Telegram bot used for lead notifications",
+      "description": "Server-only token of the Telegram bot used for lead notifications and live chat",
       "required": false
     },
     "TELEGRAM_CHAT_ID": {
-      "description": "Server-only chat ID where lead notifications are sent",
+      "description": "Server-only chat ID where lead and chat notifications are sent",
+      "required": false
+    },
+    "TELEGRAM_WEBHOOK_SECRET": {
+      "description": "Random 32-byte hex token used as `secret_token` when registering the Telegram webhook. The /api/chat/webhook handler validates every incoming request against this value via the X-Telegram-Bot-Api-Secret-Token header. Generate with `openssl rand -hex 32` and then `heroku config:set TELEGRAM_WEBHOOK_SECRET=...` BEFORE calling setWebhook.",
+      "generator": "secret",
       "required": false
     },
     "SMTP_HOST": {

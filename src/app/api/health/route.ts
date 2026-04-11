@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { size as chatStoreSize } from '@/lib/chatStore';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -31,6 +32,13 @@ export async function GET() {
           has('SMTP_FROM') &&
           has('SMTP_TO'),
         lead_webhook: has('LEAD_API_URL'),
+      },
+      chat: {
+        enabled:
+          has('TELEGRAM_BOT_TOKEN') &&
+          has('TELEGRAM_CHAT_ID') &&
+          has('TELEGRAM_WEBHOOK_SECRET'),
+        sessionCount: chatStoreSize(),
       },
     },
     { status: 200 }

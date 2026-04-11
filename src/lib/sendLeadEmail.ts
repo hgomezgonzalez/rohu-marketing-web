@@ -1,6 +1,7 @@
 import nodemailer, { type Transporter } from 'nodemailer';
 import type { Lead } from '@/types/lead';
 import { buildWhatsAppUrl } from './contactChannels';
+import { escapeHtml } from './htmlEscape';
 
 /**
  * Server-only helper that sends a new-lead email notification to the owner(s).
@@ -40,19 +41,6 @@ function getTransporter(): Transporter | null {
     auth: { user, pass },
   });
   return cachedTransporter;
-}
-
-function escapeHtml(raw: string): string {
-  return raw.replace(/[&<>"']/g, (ch) => {
-    switch (ch) {
-      case '&': return '&amp;';
-      case '<': return '&lt;';
-      case '>': return '&gt;';
-      case '"': return '&quot;';
-      case "'": return '&#39;';
-      default: return ch;
-    }
-  });
 }
 
 function buildSubject(lead: Lead): string {

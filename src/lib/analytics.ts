@@ -29,6 +29,16 @@ export const EVENTS = {
   CLICK_WHATSAPP_HERO: 'click_whatsapp_hero',
   CLICK_TELEGRAM: 'click_telegram',
   CLICK_FAQ: 'click_faq',
+  // Live chat widget
+  OPEN_CHAT_WIDGET: 'open_chat_widget',
+  CLOSE_CHAT_WIDGET: 'close_chat_widget',
+  SEND_CHAT_MESSAGE: 'send_chat_message',
+  RECEIVE_CHAT_REPLY: 'receive_chat_reply',
+  CHAT_RATE_LIMITED: 'chat_rate_limited',
+  CHAT_SESSION_RESTARTED: 'chat_session_restarted',
+  CHAT_LEAD_CARD_SHOWN: 'chat_lead_card_shown',
+  CHAT_LEAD_CARD_SUBMITTED: 'chat_lead_card_submitted',
+  CHAT_LEAD_CARD_DISMISSED: 'chat_lead_card_dismissed',
 } as const;
 
 export type EventName = (typeof EVENTS)[keyof typeof EVENTS];

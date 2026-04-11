@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 import '@/styles/globals.css';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import { WhatsAppFab } from '@/components/ui/WhatsAppFab';
+import { ChatWidget } from '@/components/chat/ChatWidget';
 import { siteConfig } from '@/lib/content';
 
 const inter = Inter({
@@ -107,7 +107,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
         </main>
         <Footer />
-        <WhatsAppFab />
+        <ChatWidget />
       </body>
     </html>
   );
