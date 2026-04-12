@@ -108,15 +108,18 @@ export default function TermsPage() {
               10. Naturaleza de Intermediación y Limitación de Responsabilidad en ROHU Connect
             </h2>
             <p className="mt-3 text-brand-muted">
-              ROHU Solutions actúa exclusivamente como proveedor de infraestructura tecnológica de
-              intermediación (Art. 10, Ley 1480/2011). Los servicios prestados a través de la
-              plataforma ROHU Connect (cerrajería, limpieza, mantenimiento y demás oficios) son
-              prestados directamente por proveedores independientes, quienes ostentan la condición
-              de proveedores del servicio final en los términos del Art. 45 de la Ley 1480/2011 y
-              sobre quienes recae la responsabilidad por la calidad, oportunidad y seguridad de su
-              prestación. ROHU Solutions no garantiza resultado, calidad ni disponibilidad de los
-              proveedores. Los datos personales de clientes y proveedores son tratados conforme a la
-              Ley 1581/2012 y la Política de Privacidad vigente.
+              ROHU Solutions opera ROHU Connect como marketplace de servicios locales y actúa como
+              intermediario tecnológico (Art. 10, Ley 1480/2011). Los servicios ofrecidos a través
+              de la plataforma (limpieza, plomería, belleza, mantenimiento, tutorías y demás oficios)
+              son prestados directamente por prestadores independientes registrados, quienes ostentan
+              la condición de proveedores del servicio final en los términos del Art. 45 de la
+              Ley 1480/2011 y sobre quienes recae la responsabilidad por la calidad, oportunidad y
+              seguridad de su prestación. Los prestadores pagan una suscripción mensual por
+              estar listados y los clientes consumidores pagan una comisión por cada servicio
+              completado a través de la plataforma. ROHU Solutions no garantiza resultado, calidad
+              ni disponibilidad de los prestadores. Los datos personales de clientes consumidores
+              y prestadores son tratados conforme a la Ley 1581/2012 y la Política de Privacidad
+              vigente.
             </p>
           </section>
 

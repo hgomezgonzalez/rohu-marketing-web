@@ -40,16 +40,16 @@ export default function PrivacyPage() {
               datos de uso del sitio. No recolectamos datos sensibles ni de menores de edad.
             </p>
             <p className="mt-3 text-brand-muted">
-              <strong>Marketplace ROHU Connect:</strong> los datos de proveedores independientes
-              persona natural que operen en plataformas white-label de ROHU Connect (nombre, documento
-              de identidad, ubicación, datos de contacto y antecedentes cuando aplique) son tratados
+              <strong>Marketplace ROHU Connect:</strong> los datos de prestadores de servicio
+              persona natural que operen en ROHU Connect (nombre, documento de identidad, ubicación,
+              datos de contacto, portafolio de servicios y antecedentes cuando aplique) son tratados
               por ROHU Solutions en calidad de Responsable del Tratamiento con finalidades de
-              habilitación, verificación y gestión operativa del marketplace, y pueden ser
-              transmitidos al cliente empresarial (operador de la plataforma white-label) en los
-              términos del Art. 25 de la Ley 1581/2012. El proveedor persona natural tiene los mismos
-              derechos de titular que cualquier otro usuario (conocer, actualizar, rectificar,
-              suprimir y revocar), ejercibles ante el correo del Oficial de Privacidad indicado en la
-              sección 1.
+              habilitación, verificación y gestión operativa del marketplace. Los datos de clientes
+              consumidores (nombre, ubicación aproximada, historial de reservas) son tratados con
+              las mismas garantías. Todo tratamiento se realiza en los términos del Art. 25 de la
+              Ley 1581/2012. Tanto prestadores como clientes tienen los mismos derechos de titular
+              que cualquier otro usuario (conocer, actualizar, rectificar, suprimir y revocar),
+              ejercibles ante el correo del Oficial de Privacidad indicado en la sección 1.
             </p>
           </section>
 

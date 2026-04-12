@@ -83,12 +83,9 @@ export default function ApplicationPage({ params }: Params) {
   };
 
   // Section nodes — built once and reordered per-app below.
-  // The funnel-designer agent flagged that B2B complex products (ROHU Connect)
-  // need a different reading order than B2B-SMB products (ROHU Contable):
-  // visitors must understand the model BEFORE the benefits make sense.
   const sectionAudienceTitle =
     app.id === 'rohu-connect'
-      ? 'Diseñado para entidades como la tuya'
+      ? 'Para quién es ROHU Connect'
       : 'Diseñado para comercios como el tuyo';
 
   const Benefits = (
@@ -157,12 +154,10 @@ export default function ApplicationPage({ params }: Params) {
     />
   );
 
-  // ROHU Connect (B2B complex) order: HowItWorks → Audience → Benefits → ...
-  // ROHU Contable (B2B SMB) keeps: Benefits → Audience → HowItWorks → ...
-  const orderedSections =
-    app.id === 'rohu-connect'
-      ? [HowItWorks, Audience, Benefits, Modules, Pricing, SocialProof, Faq]
-      : [Benefits, Audience, HowItWorks, Modules, Pricing, SocialProof, Faq];
+  // All products use the same section order: Benefits first, then Audience,
+  // HowItWorks, etc. Both ROHU Contable and ROHU Connect are now consumer-
+  // facing products where visitors benefit from seeing value before process.
+  const orderedSections = [Benefits, Audience, HowItWorks, Modules, Pricing, SocialProof, Faq];
 
   return (
     <>

@@ -28,7 +28,7 @@ Copy-paste these fields into every provider's form.
 ```
 ROHU Solutions is a Colombian software house that builds vertical
 SaaS products for small and medium businesses (e.g. ROHU Contable,
-an accounting SaaS, and ROHU Connect, a B2B collaboration product).
+an accounting SaaS, and ROHU Connect, a local services marketplace).
 rohu-solutions.com is our official corporate website: it hosts the
 company landing, product pages, privacy policy, terms of service
 and contact information. The domain was registered on 2026-04-08

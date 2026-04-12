@@ -443,327 +443,331 @@ const rohuContable: Application = {
 /**
  * ROHU Connect — second live application in the catalog.
  *
- * Sold B2B white-label: ROHU Solutions licenses the marketplace platform to
- * municipalities, chambers of commerce, cooperatives and federations who want
- * to digitalize on-demand local services in their territory. ROHU does NOT
- * operate the marketplace directly — clients run their own.
+ * Consumer-facing service marketplace operated directly by ROHU Solutions.
+ * Two roles:
+ *   - Customer: finds and books nearby service providers.
+ *   - Provider: creates a profile, manages their schedule, receives bookings.
+ *
+ * Revenue model:
+ *   - Providers pay a monthly subscription to be listed.
+ *   - Customers pay a small commission per completed service.
  *
  * Source code: /home/hfgomezgo/personal/rohu-connect (pnpm + Turborepo).
  * Stack: Next.js 14 + NestJS + PostgreSQL+PostGIS + Prisma + Redis + Sentry.
- * Public preview: https://rohu-connect-web-staging-7e1e7f374cd0.herokuapp.com/
+ * Production: https://rohu-connect-web-8cd298835155.herokuapp.com
  */
 const rohuConnect: Application = {
   id: 'rohu-connect',
   slug: 'rohu-connect',
   name: 'ROHU Connect',
   shortName: 'Connect',
-  tagline: 'Tu marketplace de servicios, en producción en 90 días',
+  tagline: 'Encuentra servicios cerca de ti y reserva al instante',
   description:
-    'Plataforma white-label que ayuda a alcaldías, cámaras, cooperativas y federaciones a ofrecer un marketplace de servicios locales bajo su propia marca, con control total del territorio. Sin construir tecnología desde cero.',
+    'Marketplace de servicios locales donde los consumidores encuentran proveedores cercanos verificados y los reservan en segundos. Prestadores gestionan su agenda, reciben clientes y construyen su reputación — todo desde una sola app.',
   status: 'live',
   iconName: 'Handshake',
   accentColor: 'secondary',
-  previewUrl: 'https://rohu-connect-web-staging-7e1e7f374cd0.herokuapp.com/',
+  previewUrl: 'https://rohu-connect-web-8cd298835155.herokuapp.com/',
   targetAudience: [
-    'Alcaldías y gobiernos municipales',
-    'Cámaras de comercio sectoriales',
-    'Cooperativas de servicios',
-    'Federaciones y gremios',
-    'Conjuntos residenciales y clubes',
-    'Operadores turísticos regionales',
+    'Personas que buscan servicios confiables cerca (limpieza, plomería, belleza, mascotas, tutorías y más)',
+    'Profesionales independientes que quieren más clientes sin pagar publicidad',
+    'Prestadores de servicios a domicilio que necesitan organizar su agenda',
+    'Negocios de servicios (peluquerías, talleres, consultorios) que quieren reservas online',
+    'Freelancers especializados que ofrecen servicios presenciales',
+    'Cualquier persona con un oficio que quiera ser encontrada fácilmente',
   ],
   audienceClosingLine:
-    'Si quieres digitalizar los servicios locales de tu territorio con proveedores cercanos verificados por ti, ROHU Connect es tu plataforma.',
+    '¿Buscas un servicio confiable cerca de ti, o eres prestador y quieres que más clientes te encuentren? ROHU Connect te conecta.',
   hero: {
-    eyebrow: 'ROHU Connect · Plataforma marketplace',
-    h1: 'Tu propio marketplace on-demand local, listo en semanas',
+    eyebrow: 'ROHU Connect · Marketplace de servicios',
+    h1: 'El servicio que necesitas, cerca de ti y listo para reservar',
     subheadline:
-      'La infraestructura tecnológica para conectar a vecinos con proveedores de servicios cercanos en tu territorio. Geolocalización, rankings, reseñas y pagos integrados.',
+      'Encuentra al profesional indicado por cercanía, reseñas y disponibilidad real. Reserva en segundos, sin llamadas. Y si eres prestador, recibe clientes nuevos todos los días.',
   },
   benefits: {
     eyebrow: 'Beneficios',
-    sectionTitle: 'La infraestructura completa de un marketplace local',
+    sectionTitle: 'Todo lo que necesitas para encontrar o prestar servicios',
     sectionSubtitle:
-      'Todo lo que necesitas para operar un marketplace de servicios on-demand sin construir nada desde cero.',
+      'Ya sea que busques un servicio o que quieras ofrecer el tuyo, ROHU Connect simplifica la conexión.',
     cards: [
-      {
-        id: 'time_to_market',
-        title: 'Lanzas en semanas',
-        description: 'Configuración por categorías y zonas en tiempo récord, no en años de desarrollo.',
-        icon: 'Rocket',
-      },
       {
         id: 'geo_matching',
         title: 'Búsqueda por cercanía',
-        description: 'Match geoespacial con PostGIS por distancia, calificación y disponibilidad real.',
+        description: 'Encuentra proveedores cerca de ti ordenados por distancia, calificación y disponibilidad real.',
         icon: 'MapPin',
       },
       {
+        id: 'instant_booking',
+        title: 'Reserva al instante',
+        description: 'Agenda el servicio que necesitas en segundos, sin llamadas ni WhatsApp de ida y vuelta.',
+        icon: 'CalendarClock',
+      },
+      {
         id: 'verified_providers',
-        title: 'Proveedores con perfil',
-        description: 'Cada proveedor pasa por tu proceso de verificación antes de aparecer en la plataforma.',
+        title: 'Proveedores verificados',
+        description: 'Cada prestador pasa por un proceso de verificación antes de aparecer en la plataforma.',
         icon: 'BadgeCheck',
       },
       {
         id: 'ratings_reviews',
-        title: 'Reseñas y calificaciones',
-        description: 'Reputación visible para el cliente, retroalimentación para el proveedor.',
+        title: 'Reseñas reales',
+        description: 'Ve lo que otros clientes opinan antes de reservar. Cada calificación viene de un servicio completado.',
         icon: 'Star',
       },
       {
-        id: 'commissions',
-        title: 'Comisiones configurables',
-        description: 'Define tu modelo de cobro y la plataforma calcula comisiones por transacción.',
-        icon: 'Percent',
+        id: 'provider_agenda',
+        title: 'Agenda inteligente para prestadores',
+        description: 'Los proveedores gestionan su disponibilidad y horarios. Anti-doble-booking automático.',
+        icon: 'Clock',
       },
       {
         id: 'notifications',
-        title: 'Notificaciones multicanal',
-        description: 'Email, SMS y push integrados desde el primer día con plantillas listas.',
+        title: 'Notificaciones en tiempo real',
+        description: 'Confirmaciones, recordatorios y actualizaciones por push, email y SMS — para clientes y prestadores.',
         icon: 'Bell',
       },
       {
         id: 'compliance',
-        title: 'Cumplimiento local',
-        description: 'Trazabilidad, datos cifrados y alineación con la Ley 1581 de Habeas Data.',
+        title: 'Datos protegidos',
+        description: 'Trazabilidad completa, cifrado de datos sensibles y alineación con la Ley 1581 de Habeas Data.',
         icon: 'ShieldCheck',
       },
     ],
   },
   howItWorks: {
-    eyebrow: 'Cómo trabajamos contigo',
-    sectionTitle: 'De la idea al lanzamiento en cuatro pasos',
+    eyebrow: 'Cómo funciona',
+    sectionTitle: 'Así de fácil es usar ROHU Connect',
     sectionSubtitle:
-      'Acompañamos a tu equipo desde el diagnóstico inicial hasta el primer mes en producción.',
+      'Ya seas cliente buscando un servicio o prestador ofreciendo el tuyo, el proceso es simple.',
     steps: [
       {
         number: 1,
-        title: 'Diagnóstico del territorio',
+        title: 'Busca o regístrate',
         description:
-          'Entendemos tu sector, las categorías de servicio prioritarias y el volumen esperado de usuarios.',
-        hint: 'Sin compromiso, en una sola sesión de descubrimiento.',
+          'Como cliente: busca el servicio que necesitas por categoría y ubicación. Como prestador: crea tu perfil profesional con servicios, fotos y horarios.',
+        hint: 'Regístrate gratis en menos de 2 minutos.',
       },
       {
         number: 2,
-        title: 'Configuración a tu medida',
+        title: 'Compara y elige',
         description:
-          'Configuramos categorías, zonas, comisiones y reglas de matching según tu modelo operativo.',
-        hint: 'Tu equipo ve y aprueba cada decisión antes de pasar a producción.',
+          'Ve los proveedores más cercanos con sus calificaciones, precios y disponibilidad real. Elige el que mejor se ajuste a lo que necesitas.',
+        hint: 'Filtros por distancia, precio, calificación y horario.',
       },
       {
         number: 3,
-        title: 'Capacitación de proveedores piloto',
+        title: 'Reserva y confirma',
         description:
-          'Ayudamos a registrar y verificar el primer grupo de proveedores con sesiones grupales.',
-        hint: 'Empezamos pequeño y crecemos cuando las primeras transacciones validen el modelo.',
+          'Agenda el servicio en la franja horaria que te sirva. El prestador recibe la solicitud y confirma en minutos.',
+        hint: 'Sin llamadas, sin WhatsApp, sin esperas innecesarias.',
       },
       {
         number: 4,
-        title: 'Lanzamiento y acompañamiento',
+        title: 'Recibe, califica y repite',
         description:
-          'Te acompañamos durante el lanzamiento y los primeros meses con soporte y mejoras continuas.',
-        hint: 'Nunca quedas solo con la plataforma encendida.',
+          'Disfruta el servicio, califica al prestador y ayuda a la comunidad. El prestador construye su reputación con cada trabajo bien hecho.',
+        hint: 'Tu calificación ayuda a otros clientes a elegir mejor.',
       },
     ],
   },
   modules: {
-    eyebrow: 'Módulos',
-    sectionTitle: 'Doce módulos que componen la plataforma',
+    eyebrow: 'Funcionalidades',
+    sectionTitle: 'Todo lo que hace posible la conexión',
     sectionSubtitle:
-      'Construidos sobre Next.js, NestJS y PostgreSQL con PostGIS — listos para producción.',
+      'Tecnología construida para conectar clientes y prestadores con la menor fricción posible.',
     items: [
-      { id: 'identity', label: 'Identidad y acceso', description: 'Registro, login y roles con cifrado de datos sensibles.', icon: 'KeyRound' },
-      { id: 'geo_matching', label: 'Búsqueda por cercanía', description: 'Match geoespacial por distancia, rating y disponibilidad.', icon: 'MapPin' },
-      { id: 'requests', label: 'Solicitudes', description: 'Flujo completo de pedidos: pendiente, asignado, completado.', icon: 'ClipboardList' },
-      { id: 'profiles', label: 'Perfiles y verificación', description: 'Catálogo de proveedores con datos, fotos y validación.', icon: 'BadgeCheck' },
-      { id: 'booking', label: 'Reservas y agenda', description: 'Reservas con anti-doble-booking automático en horario.', icon: 'CalendarClock' },
-      { id: 'reviews', label: 'Calificaciones', description: 'Reseñas con promedio visible para clientes y proveedores.', icon: 'Star' },
-      { id: 'commissions', label: 'Comisiones', description: 'Cálculo automático por transacción según tu modelo.', icon: 'Percent' },
-      { id: 'notifications', label: 'Notificaciones', description: 'Email, SMS, push e in-app con cola de reintentos.', icon: 'Bell' },
-      { id: 'admin', label: 'Panel administrativo', description: 'Gestión de proveedores, disputas y operación diaria.', icon: 'LayoutDashboard' },
-      { id: 'audit', label: 'Trazabilidad', description: 'Registro auditable de cada acción importante en la plataforma.', icon: 'ScrollText' },
-      { id: 'i18n', label: 'Multi-idioma', description: 'Interfaz preparada para varios idiomas con next-intl.', icon: 'Languages' },
-      { id: 'realtime', label: 'Cola en tiempo real', description: 'Procesamiento asíncrono con Redis y BullMQ.', icon: 'Zap' },
+      { id: 'identity', label: 'Registro y acceso', description: 'Crea tu cuenta como cliente o prestador con datos cifrados.', icon: 'KeyRound' },
+      { id: 'geo_matching', label: 'Búsqueda geoespacial', description: 'Encuentra proveedores cercanos por distancia, rating y disponibilidad.', icon: 'MapPin' },
+      { id: 'requests', label: 'Solicitudes de servicio', description: 'Flujo completo: solicitud, asignación, ejecución y cierre.', icon: 'ClipboardList' },
+      { id: 'profiles', label: 'Perfiles de prestador', description: 'Portafolio profesional con servicios, fotos, precios y verificación.', icon: 'BadgeCheck' },
+      { id: 'booking', label: 'Reservas y agenda', description: 'Agendamiento con anti-doble-booking automático en el horario del prestador.', icon: 'CalendarClock' },
+      { id: 'reviews', label: 'Calificaciones', description: 'Reseñas de clientes reales con promedio visible para todos.', icon: 'Star' },
+      { id: 'commissions', label: 'Comisiones y cobros', description: 'Cálculo automático de comisión por servicio completado.', icon: 'Percent' },
+      { id: 'notifications', label: 'Notificaciones', description: 'Push, email, SMS e in-app para confirmaciones, recordatorios y actualizaciones.', icon: 'Bell' },
+      { id: 'admin', label: 'Panel de operación', description: 'Gestión de proveedores, verificación, disputas y métricas del marketplace.', icon: 'LayoutDashboard' },
+      { id: 'audit', label: 'Trazabilidad', description: 'Registro auditable de cada reserva, pago y acción en la plataforma.', icon: 'ScrollText' },
+      { id: 'i18n', label: 'Multi-idioma', description: 'Interfaz lista para varios idiomas y expansión regional.', icon: 'Languages' },
+      { id: 'realtime', label: 'Procesamiento en tiempo real', description: 'Confirmaciones instantáneas y actualizaciones de estado en vivo.', icon: 'Zap' },
     ],
   },
   pricing: {
     eyebrow: 'Planes y precios',
-    sectionTitle: 'Elige el alcance que se ajusta a tu territorio',
+    sectionTitle: 'Un modelo justo para clientes y prestadores',
     sectionSubtitle:
-      'Tres tiers pensados para diferentes tamaños de operación. Todos incluyen acompañamiento de implementación.',
+      'Los clientes buscan y reservan gratis. Los prestadores eligen el plan que se ajusta a su volumen. ROHU cobra una comisión mínima por cada servicio completado.',
     tiers: [
       {
-        id: 'municipio',
-        name: 'Municipio',
-        tagline: 'Para empezar en una ciudad',
+        id: 'starter',
+        name: 'Inicial',
+        tagline: 'Para prestadores que empiezan',
         isPopular: false,
         targetAudience:
-          'Ideal para municipios pequeños o cooperativas que quieren validar el modelo en una sola categoría.',
+          'Ideal para profesionales independientes que quieren probar la plataforma y recibir sus primeros clientes.',
         features: [
-          'Hasta 100 proveedores activos',
-          '1 categoría de servicio',
-          'Hasta 500 transacciones / mes',
-          'Comisión fija por transacción',
-          '1 zona geográfica',
+          'Perfil profesional verificado',
+          'Hasta 3 categorías de servicio',
+          'Agenda con anti-doble-booking',
+          'Hasta 20 reservas / mes',
+          'Reseñas y calificaciones',
+          'Notificaciones push y email',
           'Soporte por email',
-          'Capacitación inicial guiada',
         ],
-        highlightedFeatures: ['1 categoría', '100 proveedores', 'Soporte por email'],
-        ctaLabel: 'Pedir propuesta',
-        billingNote: 'Configuración inicial incluida · sin permanencia',
+        highlightedFeatures: ['Perfil verificado', '20 reservas/mes', 'Gratis para empezar'],
+        ctaLabel: 'Empezar gratis',
+        billingNote: 'Gratis el primer mes · luego $29.900/mes + comisión por servicio',
       },
       {
-        id: 'metropolitana',
-        name: 'Área metropolitana',
-        tagline: 'Para territorios en expansión',
+        id: 'profesional',
+        name: 'Profesional',
+        tagline: 'Para prestadores con flujo constante',
         isPopular: true,
         popularLabel: 'Más popular',
         targetAudience:
-          'Para alcaldías de ciudades intermedias, cámaras de comercio y federaciones con varios sectores.',
+          'Para profesionales y negocios que ya tienen clientes y quieren crecer con más visibilidad y herramientas.',
         features: [
-          'Hasta 1.000 proveedores activos',
-          'Categorías ilimitadas',
-          'Hasta 10.000 transacciones / mes',
-          'Comisión configurable por categoría',
-          'Hasta 3 zonas geográficas',
+          'Categorías de servicio ilimitadas',
+          'Reservas ilimitadas',
+          'Prioridad en resultados de búsqueda',
+          'Panel de métricas y rendimiento',
+          'Fotos y portafolio extendido',
           'Soporte prioritario por chat',
-          'Capacitación extendida y reportes',
+          'Insignia "Profesional" en perfil',
         ],
-        highlightedFeatures: ['Categorías ilimitadas', '1.000 proveedores', 'Comisión configurable'],
-        ctaLabel: 'Pedir propuesta',
-        billingNote: 'Implementación guiada de 4 a 8 semanas',
+        highlightedFeatures: ['Reservas ilimitadas', 'Prioridad en búsqueda', 'Panel de métricas'],
+        ctaLabel: 'Elegir Profesional',
+        billingNote: '$59.900/mes + comisión por servicio · sin permanencia',
       },
       {
-        id: 'enterprise',
-        name: 'Enterprise',
-        tagline: 'A la medida de tu organización',
+        id: 'negocio',
+        name: 'Negocio',
+        tagline: 'Para negocios con equipo',
         isPopular: false,
         targetAudience:
-          'Para grandes ciudades, redes nacionales y organizaciones que necesitan marca propia e integraciones.',
+          'Para peluquerías, talleres, consultorios y negocios de servicios que tienen múltiples empleados atendiendo.',
         features: [
-          'Proveedores y transacciones ilimitados',
-          'Marca propia (white-label) end-to-end',
-          'API de lectura y escritura',
-          'Zonas geográficas ilimitadas',
-          'Integraciones a la medida',
-          'Contacto dedicado y SLA reforzado',
-          'Implementación personalizada',
+          'Todo lo del plan Profesional',
+          'Múltiples prestadores bajo una misma cuenta',
+          'Agendas individuales por empleado',
+          'Reportes consolidados del negocio',
+          'Comisión reducida por volumen',
+          'Contacto dedicado de soporte',
+          'Personalización de perfil del negocio',
         ],
-        highlightedFeatures: ['White-label completo', 'API R+W', 'Contacto dedicado'],
-        ctaLabel: 'Pedir propuesta',
-        billingNote: 'Condiciones a la medida · alcance regional o nacional',
+        highlightedFeatures: ['Equipo multi-prestador', 'Comisión reducida', 'Contacto dedicado'],
+        ctaLabel: 'Cotizar para mi negocio',
+        billingNote: 'Desde $99.900/mes · precio según número de empleados',
       },
     ],
   },
   socialProof: {
     eyebrow: 'Testimonios',
-    sectionTitle: 'Lo que dicen las organizaciones que ya operan con ROHU Connect',
+    sectionTitle: 'Lo que dicen quienes ya usan ROHU Connect',
     disclaimer:
-      'Los siguientes testimonios son ilustrativos y no corresponden a clientes reales identificados.',
+      'Los siguientes testimonios son ilustrativos y no corresponden a usuarios reales identificados.',
     testimonials: [
       {
         id: 'ct1',
         quote:
-          'Necesitábamos digitalizar los servicios del municipio y pensábamos construirlo desde cero. ROHU Connect nos ahorró meses de desarrollo.',
-        name: 'Laura V.',
-        role: 'Directora de innovación',
-        business: 'Alcaldía municipal · Cundinamarca',
+          'Antes pasaba horas en WhatsApp buscando quién me arreglara una llave. Ahora abro Connect, veo quién está cerca y disponible, y reservo en un minuto.',
+        name: 'Carolina M.',
+        role: 'Cliente frecuente',
+        business: 'Bogotá',
       },
       {
         id: 'ct2',
         quote:
-          'La verificación de proveedores la manejamos nosotros directamente desde el panel. Eso nos da control y transparencia para nuestros agremiados.',
-        name: 'Andrés B.',
-        role: 'Gerente de proyectos',
-        business: 'Cámara de comercio sectorial',
+          'Desde que estoy en ROHU Connect me llegan clientes nuevos todas las semanas sin gastar en publicidad. La agenda me organiza el día y las reseñas me dan credibilidad.',
+        name: 'Jorge L.',
+        role: 'Electricista independiente',
+        business: 'Medellín',
       },
       {
         id: 'ct3',
         quote:
-          'El equipo de ROHU acompañó cada decisión, desde las categorías hasta el modelo de comisiones. Lanzamos con seguridad.',
-        name: 'Marcela T.',
-        role: 'Coordinadora operativa',
-        business: 'Cooperativa de servicios · Antioquia',
+          'En mi peluquería teníamos una libreta para las citas. Ahora los clientes reservan directo y cada estilista ve su propia agenda. Menos líos y más tiempo para trabajar.',
+        name: 'Sandra P.',
+        role: 'Dueña de peluquería',
+        business: 'Cali',
       },
     ],
   },
   faqs: {
     eyebrow: 'Preguntas frecuentes',
-    sectionTitle: '¿Listo para entender la plataforma a fondo?',
+    sectionTitle: '¿Cómo funciona ROHU Connect?',
     sectionSubtitle:
-      'Las respuestas que más nos piden las organizaciones interesadas en lanzar su marketplace.',
+      'Las respuestas que más nos hacen clientes y prestadores.',
     items: [
       {
-        id: 'vs_build',
-        question: '¿Qué diferencia a ROHU Connect de construir nuestro propio marketplace?',
+        id: 'what_is',
+        question: '¿Qué es ROHU Connect?',
         answer:
-          'Tiempo y costo. ROHU Connect ya tiene los componentes complejos resueltos: matching geoespacial, reservas anti-doble-booking, notificaciones y trazabilidad. Tu equipo se concentra en la operación local, no en construir software.',
+          'Es un marketplace de servicios locales donde los consumidores encuentran proveedores cercanos verificados (limpieza, plomería, belleza, mascotas, tutorías y más) y reservan directamente desde la app. Para los prestadores, es un canal de clientes nuevos con agenda integrada.',
       },
       {
-        id: 'time',
-        question: '¿Cuánto tarda la implementación?',
+        id: 'cost_customer',
+        question: '¿Cuánto cuesta usar ROHU Connect como cliente?',
         answer:
-          'Entre 4 y 8 semanas, según el tamaño del territorio, la cantidad de categorías y la complejidad de la verificación inicial de proveedores.',
+          'Buscar, comparar y reservar es gratis. Solo se cobra una comisión pequeña al completarse cada servicio, que ayuda a mantener la plataforma, las verificaciones y el soporte.',
+      },
+      {
+        id: 'cost_provider',
+        question: '¿Cuánto cuesta para un prestador?',
+        answer:
+          'El primer mes es gratis para que pruebes sin compromiso. Después, eliges un plan mensual según tu volumen (desde $29.900/mes). Además hay una comisión por cada servicio completado. Sin permanencia: puedes cancelar cuando quieras.',
       },
       {
         id: 'categories',
-        question: '¿Qué categorías de servicio podemos ofrecer?',
+        question: '¿Qué servicios puedo encontrar o ofrecer?',
         answer:
-          'Las que decidas. La plataforma soporta cualquier servicio local que pueda reservarse: cerrajería, limpieza, manicura, mecánica, mantenimiento del hogar, salud preventiva, entre otros.',
+          'Cualquier servicio local que pueda reservarse: limpieza del hogar, cerrajería, plomería, electricidad, manicura, peluquería, cuidado de mascotas, clases particulares, mecánica, mantenimiento, y muchos más.',
       },
       {
         id: 'verification',
-        question: '¿Cómo se verifican los proveedores?',
+        question: '¿Cómo sé que un prestador es confiable?',
         answer:
-          'Tu equipo define el proceso de verificación. La plataforma te entrega las herramientas (perfiles, documentos, estado de aprobación) y tu organización valida cada proveedor antes de activarlo.',
+          'Cada prestador pasa por un proceso de verificación de identidad y documentos antes de aparecer en la plataforma. Además, las reseñas son de clientes reales que efectivamente recibieron el servicio.',
       },
       {
-        id: 'payments',
-        question: '¿Cómo se manejan los pagos y las comisiones?',
+        id: 'booking',
+        question: '¿Cómo funciona la reserva?',
         answer:
-          'En el MVP las comisiones se calculan automáticamente y se reportan. La integración con pasarelas de pago colombianas (Wompi, PayU) está en la hoja de ruta de la versión 1.',
+          'Buscas el servicio, eliges al prestador que prefieres según cercanía, precio y reseñas, y seleccionas la franja horaria disponible. El prestador confirma en minutos. Sin llamadas.',
       },
       {
-        id: 'territory',
-        question: '¿Tenemos control sobre el territorio y las zonas de cobertura?',
+        id: 'cancellations',
+        question: '¿Qué pasa si necesito cancelar una reserva?',
         answer:
-          'Sí. Tú defines las zonas geográficas, los radios de cobertura por categoría y las reglas de asignación. Todo configurable desde el panel administrativo.',
-      },
-      {
-        id: 'white_label',
-        question: '¿Podemos usar nuestra propia marca?',
-        answer:
-          'Sí, en el plan Enterprise. La plataforma se entrega con tu marca, dominio y colores. Los planes Municipio y Área metropolitana mantienen co-branding con ROHU Connect.',
+          'Puedes cancelar sin costo si lo haces con más de 24 horas de anticipación. Las cancelaciones tardías pueden generar un cargo mínimo para proteger al prestador que ya reservó su tiempo.',
       },
       {
         id: 'disputes',
-        question: '¿Qué pasa con las disputas entre cliente y proveedor?',
+        question: '¿Qué pasa si hay un problema con el servicio?',
         answer:
-          'Tu equipo administrativo gestiona las disputas desde el panel de la plataforma. ROHU Solutions provee la infraestructura tecnológica y las herramientas, pero la mediación es responsabilidad de quien opera el marketplace.',
+          'Puedes reportar el problema desde la app. Nuestro equipo de soporte media entre cliente y prestador para encontrar una solución justa. La trazabilidad de la reserva ayuda a resolver disputas rápidamente.',
       },
       {
         id: 'mobile',
-        question: '¿Hay app móvil nativa?',
+        question: '¿Hay app móvil?',
         answer:
-          'Por ahora la plataforma es una PWA mobile-first instalable desde el navegador. Las apps nativas para iOS y Android están planeadas en la versión 1 del producto.',
+          'Por ahora ROHU Connect es una app web progresiva (PWA) que se instala desde el navegador y funciona como app nativa. Las apps para iOS y Android están en desarrollo.',
       },
       {
-        id: 'integrations',
-        question: '¿Cómo se integra con nuestros sistemas actuales?',
+        id: 'coverage',
+        question: '¿En qué ciudades está disponible?',
         answer:
-          'Los planes Área metropolitana y Enterprise incluyen acceso a la API. En Enterprise también ofrecemos integraciones a la medida según tus sistemas existentes.',
+          'Estamos empezando en las principales ciudades de Colombia y expandiendo cobertura cada mes. Si no hay prestadores en tu zona aún, regístrate como prestador y sé el primero.',
       },
     ],
   },
   ctaFinal: {
-    eyebrow: 'Hablemos de tu marketplace',
-    sectionTitle: '¿Listo para lanzar tu plataforma de servicios?',
+    eyebrow: '¿Listo para conectar?',
+    sectionTitle: 'Encuentra servicios o consigue más clientes hoy',
     body:
-      'Cuéntanos sobre tu organización, el territorio que quieres cubrir y las categorías de servicio que tienes en mente. Te respondemos con una propuesta a tu medida.',
+      'Si buscas un servicio confiable cerca de ti, entra y reserva. Si eres prestador y quieres que más personas te encuentren, crea tu perfil en minutos. ROHU Connect te conecta con quien necesitas.',
   },
-  metaTitle: 'ROHU Connect — Plataforma marketplace on-demand white-label',
+  metaTitle: 'ROHU Connect — Encuentra servicios cerca de ti y reserva al instante',
   metaDescription:
-    'Lanza tu propio marketplace on-demand local en semanas. Geolocalización, rankings, reseñas y pagos integrados. Para alcaldías, cámaras de comercio, cooperativas y federaciones.',
+    'Marketplace de servicios locales. Encuentra proveedores verificados por cercanía, reseñas y disponibilidad. Reserva limpieza, plomería, belleza, mascotas y más en segundos. Prestadores: recibe clientes nuevos con agenda integrada.',
 };
 
 /**
