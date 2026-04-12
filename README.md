@@ -2,7 +2,7 @@
 
 Sitio web corporativo y de ventas para **ROHU Solutions**, empresa colombiana que desarrolla aplicaciones SaaS para el comercio y las pymes. **ROHU Contable** es la primera aplicación del catálogo; más se agregarán con el tiempo y el sitio está preparado para escalar sin refactors.
 
-Producto-demo de ROHU Contable: https://rohu-contable-prod-3fba93dd2eb4.herokuapp.com/
+Producto-demo de ROHU Contable: https://rohu-accountant-42a1913f511f.herokuapp.com/
 
 > **Idioma UI:** Español (Colombia) · **Código:** Inglés
 > **Stack:** Next.js 14 (App Router) · TypeScript · Tailwind CSS · react-hook-form · zod · nodemailer
@@ -261,7 +261,7 @@ heroku create rohu-marketing-web --region us
 # 2. Config vars (ver .env.example para la lista completa)
 heroku config:set -a rohu-marketing-web \
   NEXT_PUBLIC_SITE_URL=https://rohu-marketing-web-06a37233de1e.herokuapp.com \
-  NEXT_PUBLIC_DEMO_URL=https://rohu-contable-prod-3fba93dd2eb4.herokuapp.com/ \
+  NEXT_PUBLIC_DEMO_URL=https://rohu-accountant-42a1913f511f.herokuapp.com/ \
   NEXT_PUBLIC_DEMO_USER=demo@rohu-contable.com \
   NEXT_PUBLIC_DEMO_PASSWORD=demo1234 \
   NEXT_PUBLIC_WHATSAPP_PHONE=57300XXXXXXX \

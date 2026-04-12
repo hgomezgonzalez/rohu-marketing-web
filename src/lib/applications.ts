@@ -145,7 +145,7 @@ const rohuContable: Application = {
   audienceClosingLine:
     'Si vendes productos y quieres llevar la contabilidad en orden, ROHU Contable es para ti.',
   demo: {
-    url: 'https://rohu-contable-prod-3fba93dd2eb4.herokuapp.com/',
+    url: 'https://rohu-accountant-42a1913f511f.herokuapp.com/',
     user: 'demo@rohu-contable.com',
     password: 'demo1234',
     notice:

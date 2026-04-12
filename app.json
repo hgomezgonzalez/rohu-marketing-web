@@ -15,7 +15,7 @@
     },
     "NEXT_PUBLIC_DEMO_URL": {
       "description": "URL of the hosted ROHU Contable demo",
-      "value": "https://rohu-contable-prod-3fba93dd2eb4.herokuapp.com/"
+      "value": "https://rohu-accountant-42a1913f511f.herokuapp.com/"
     },
     "NEXT_PUBLIC_DEMO_USER": {
       "description": "Public demo username (fake data)",
