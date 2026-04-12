@@ -25,6 +25,8 @@ const APP_MESSAGES: Record<string, string> = {
     'Hola, estoy viendo ROHU Contable. ¿Cómo funciona para mi negocio y cuáles son los planes?',
   'rohu-connect':
     'Hola, vi ROHU Connect. Quiero saber cómo funciona para ofrecer o encontrar servicios cerca. ¿Me cuentan?',
+  'rohu-learn-english':
+    'Hola, vi ROHU Learn English y quiero practicar inglés con la tutora IA. ¿Cómo empiezo?',
 };
 
 export function buildContextualWhatsAppMessage(pathname: string | null | undefined): string {

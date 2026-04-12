@@ -771,6 +771,314 @@ const rohuConnect: Application = {
 };
 
 /**
+ * ROHU Learn English — third live application in the catalog.
+ *
+ * AI-powered English tutoring platform for Spanish speakers. Conversational
+ * practice with "Ms. Emma" (Groq LLaMA 3.1 8B), vocab & listening quizzes,
+ * verb conjugation tables, TTS/STT pronunciation, and a gamified XP/level
+ * progression system (7 levels, daily streaks).
+ *
+ * Source code: /home/hfgomezgo/personal/learn-english
+ * Stack: Next.js 16 + React 19 + TypeScript + Tailwind 4 + Groq SDK.
+ * Production: https://rohu-learn-english-618631350630.herokuapp.com
+ */
+const rohuLearnEnglish: Application = {
+  id: 'rohu-learn-english',
+  slug: 'rohu-learn-english',
+  name: 'ROHU Learn English',
+  shortName: 'Learn English',
+  tagline: 'Aprende inglés conversando con una tutora IA',
+  description:
+    'Plataforma de aprendizaje de inglés para hispanohablantes con tutora IA conversacional, quizzes de vocabulario y listening, conjugaciones, pronunciación y un sistema de niveles con XP y rachas diarias. Sin libros, sin clases aburridas.',
+  status: 'live',
+  iconName: 'GraduationCap',
+  accentColor: 'accent',
+  previewUrl: 'https://rohu-learn-english-618631350630.herokuapp.com/',
+  targetAudience: [
+    'Hispanohablantes que quieren mejorar su inglés conversando',
+    'Estudiantes de colegio o universidad que necesitan practicar',
+    'Profesionales que requieren inglés para su trabajo',
+    'Viajeros preparándose para un viaje al exterior',
+    'Personas autodidactas que prefieren aprender a su ritmo',
+    'Padres que buscan una herramienta práctica para sus hijos',
+  ],
+  audienceClosingLine:
+    'Si hablas español y quieres mejorar tu inglés con práctica real y feedback inmediato, ROHU Learn English es para ti.',
+  hero: {
+    eyebrow: 'ROHU Learn English · Tutor IA',
+    h1: 'Aprende inglés conversando con Ms. Emma, tu tutora de inteligencia artificial',
+    subheadline:
+      'Practica inglés hablando con una IA que te corrige en tiempo real, te hace quizzes y te sube de nivel. Sin libros, sin horarios, sin presión. Desde tu celular o computador.',
+  },
+  benefits: {
+    eyebrow: 'Beneficios',
+    sectionTitle: 'Todo lo que necesitas para aprender inglés de verdad',
+    sectionSubtitle:
+      'No es una app de memoria. Es práctica conversacional real con una tutora que te corrige, te reta y te motiva.',
+    cards: [
+      {
+        id: 'ai_chat',
+        title: 'Conversación con IA',
+        description: 'Chatea en inglés con Ms. Emma. Ella te responde, te corrige la gramática y te sugiere frases para practicar.',
+        icon: 'MessageCircle',
+      },
+      {
+        id: 'grammar_feedback',
+        title: 'Corrección gramatical instantánea',
+        description: 'Cada mensaje que envías recibe feedback: puntaje por gramática correcta y señalamiento de errores con explicación.',
+        icon: 'CheckCircle',
+      },
+      {
+        id: 'vocab_quiz',
+        title: 'Quizzes de vocabulario',
+        description: 'Tres niveles de dificultad (fácil, medio, difícil). Responde escribiendo o hablando — ganas más puntos con voz.',
+        icon: 'Brain',
+      },
+      {
+        id: 'listening',
+        title: 'Comprensión auditiva',
+        description: 'Escucha frases y responde preguntas. 10 preguntas por sesión con bonificación por pronunciación.',
+        icon: 'Headphones',
+      },
+      {
+        id: 'pronunciation',
+        title: 'Pronunciación con voz real',
+        description: 'El sistema lee en voz alta y tú respondes hablando. Reconocimiento de voz integrado en el navegador.',
+        icon: 'Mic',
+      },
+      {
+        id: 'conjugations',
+        title: 'Conjugaciones de verbos',
+        description: 'Panel interactivo con conjugaciones por tiempo verbal y pronombre. Busca cualquier verbo y ve todas sus formas.',
+        icon: 'BookOpen',
+      },
+      {
+        id: 'gamification',
+        title: 'XP, niveles y rachas diarias',
+        description: '7 niveles de Beginner a Master. Ganas XP por cada mensaje, quiz y palabra buscada. Mantén tu racha diaria.',
+        icon: 'Trophy',
+      },
+    ],
+  },
+  howItWorks: {
+    eyebrow: 'Cómo funciona',
+    sectionTitle: 'Así de simple es empezar a practicar',
+    sectionSubtitle:
+      'No necesitas saber inglés perfecto para empezar. Ms. Emma se adapta a tu nivel.',
+    steps: [
+      {
+        number: 1,
+        title: 'Crea tu cuenta',
+        description:
+          'Regístrate en menos de un minuto. No necesitas tarjeta de crédito ni descargar nada.',
+        hint: 'Funciona directo desde el navegador de tu celular o computador.',
+      },
+      {
+        number: 2,
+        title: 'Conversa con Ms. Emma',
+        description:
+          'Escríbele en inglés (o en español si necesitas ayuda) y ella te responde con correcciones y sugerencias.',
+        hint: 'La IA se adapta a tu nivel. Si eres principiante, te guía paso a paso.',
+      },
+      {
+        number: 3,
+        title: 'Practica con quizzes',
+        description:
+          'Pon a prueba tu vocabulario y comprensión auditiva con quizzes interactivos. Puedes responder escribiendo o hablando.',
+        hint: '+10 XP por respuesta correcta escrita, +15 XP si la dices con voz.',
+      },
+      {
+        number: 4,
+        title: 'Sube de nivel',
+        description:
+          'Acumula XP, sube de nivel (de Beginner a Master) y mantén tu racha diaria. Cada día que practiques cuenta.',
+        hint: '7 niveles, 2.000+ XP para llegar a Master. ¿Cuánto te tardas?',
+      },
+    ],
+  },
+  modules: {
+    eyebrow: 'Funcionalidades',
+    sectionTitle: 'Ocho herramientas para aprender de verdad',
+    sectionSubtitle:
+      'Cada módulo está diseñado para practicar una habilidad diferente del inglés.',
+    items: [
+      { id: 'ai_tutor', label: 'Chat con Ms. Emma', description: 'Conversación IA con feedback gramatical y sugerencias contextuales.', icon: 'MessageCircle' },
+      { id: 'vocab_quiz', label: 'Quiz de vocabulario', description: 'Preguntas generadas por IA en 3 niveles de dificultad.', icon: 'Brain' },
+      { id: 'listening_quiz', label: 'Quiz de listening', description: '10 preguntas de comprensión auditiva por sesión.', icon: 'Headphones' },
+      { id: 'conjugations', label: 'Conjugaciones', description: 'Panel interactivo de verbos por tiempo y pronombre.', icon: 'BookOpen' },
+      { id: 'dictionary', label: 'Diccionario', description: 'Busca palabras con definición, pistas en español y pronunciación.', icon: 'Search' },
+      { id: 'tts', label: 'Texto a voz', description: 'Escucha la pronunciación correcta de cualquier frase.', icon: 'Volume2' },
+      { id: 'stt', label: 'Voz a texto', description: 'Responde hablando. El sistema reconoce tu voz y valida tu pronunciación.', icon: 'Mic' },
+      { id: 'progression', label: 'Progresión y niveles', description: 'XP, 7 niveles, rachas diarias e historial de 30 días.', icon: 'Trophy' },
+    ],
+  },
+  pricing: {
+    eyebrow: 'Planes y precios',
+    sectionTitle: 'Empieza gratis y avanza a tu ritmo',
+    sectionSubtitle:
+      'No necesitas pagar para empezar a practicar. Cuando quieras más, elige el plan que se ajuste a ti.',
+    tiers: [
+      {
+        id: 'free',
+        name: 'Gratis',
+        tagline: 'Para probar sin compromiso',
+        isPopular: false,
+        targetAudience:
+          'Ideal para quien quiere conocer la plataforma y hacer sus primeras conversaciones con Ms. Emma.',
+        features: [
+          'Chat con Ms. Emma (10 mensajes/día)',
+          '1 quiz de vocabulario diario',
+          'Diccionario y conjugaciones ilimitados',
+          'Texto a voz incluido',
+          'Progresión y niveles',
+          'Racha diaria',
+        ],
+        highlightedFeatures: ['10 mensajes/día', 'Quiz diario', 'Gratis por siempre'],
+        ctaLabel: 'Empezar gratis',
+        billingNote: 'Sin tarjeta de crédito · sin límite de tiempo',
+      },
+      {
+        id: 'premium',
+        name: 'Premium',
+        tagline: 'Para quien quiere aprender en serio',
+        isPopular: true,
+        popularLabel: 'Más popular',
+        targetAudience:
+          'Para estudiantes y profesionales que quieren práctica ilimitada y acceso a todos los módulos.',
+        features: [
+          'Chat ilimitado con Ms. Emma',
+          'Quizzes de vocabulario y listening ilimitados',
+          'Reconocimiento de voz (STT)',
+          'Todos los niveles de dificultad',
+          'Historial completo de progreso',
+          'Soporte prioritario',
+          'Sin publicidad',
+        ],
+        highlightedFeatures: ['Chat ilimitado', 'Listening + STT', 'Sin publicidad'],
+        ctaLabel: 'Elegir Premium',
+        billingNote: '$29.900/mes · cancela cuando quieras',
+      },
+      {
+        id: 'familiar',
+        name: 'Familiar',
+        tagline: 'Para toda la familia',
+        isPopular: false,
+        targetAudience:
+          'Para familias que quieren que todos practiquen. Hasta 5 perfiles independientes con progreso separado.',
+        features: [
+          'Todo lo del plan Premium',
+          'Hasta 5 perfiles independientes',
+          'Progreso separado por persona',
+          'Control parental para menores',
+          'Reportes de avance por perfil',
+          'Precio por familia, no por persona',
+        ],
+        highlightedFeatures: ['5 perfiles', 'Control parental', 'Progreso individual'],
+        ctaLabel: 'Elegir Familiar',
+        billingNote: '$49.900/mes · hasta 5 personas',
+      },
+    ],
+  },
+  socialProof: {
+    eyebrow: 'Testimonios',
+    sectionTitle: 'Lo que dicen quienes ya practican con Ms. Emma',
+    disclaimer:
+      'Los siguientes testimonios son ilustrativos y no corresponden a usuarios reales identificados.',
+    testimonials: [
+      {
+        id: 'let1',
+        quote:
+          'Llevo tres semanas hablando con Ms. Emma todos los días. Me corrige sin hacerme sentir mal y cada día entiendo más. Ya voy en nivel Pre-Intermediate.',
+        name: 'Daniela R.',
+        role: 'Estudiante universitaria',
+        business: 'Bogotá',
+      },
+      {
+        id: 'let2',
+        quote:
+          'En mi trabajo necesito leer emails en inglés y responder rápido. Desde que uso ROHU Learn English me siento más seguro escribiendo — Ms. Emma me enseñó estructuras que no encontré en ningún curso.',
+        name: 'Carlos M.',
+        role: 'Analista de comercio exterior',
+        business: 'Medellín',
+      },
+      {
+        id: 'let3',
+        quote:
+          'Mis hijos no querían tomar clases de inglés. Con Ms. Emma practican solos, les gustan los quizzes y compiten por quién tiene más XP. Ahora practican sin que les toque rogarles.',
+        name: 'Patricia G.',
+        role: 'Madre de familia',
+        business: 'Cali',
+      },
+    ],
+  },
+  faqs: {
+    eyebrow: 'Preguntas frecuentes',
+    sectionTitle: '¿Cómo funciona ROHU Learn English?',
+    sectionSubtitle:
+      'Las respuestas que más nos hacen los usuarios antes de empezar.',
+    items: [
+      {
+        id: 'what_is',
+        question: '¿Qué es ROHU Learn English?',
+        answer:
+          'Es una plataforma web donde practicas inglés conversando con Ms. Emma, una tutora de inteligencia artificial. Ella te corrige la gramática, te sugiere frases y te hace quizzes de vocabulario y comprensión auditiva.',
+      },
+      {
+        id: 'level',
+        question: '¿Necesito saber inglés para empezar?',
+        answer:
+          'No. Ms. Emma se adapta a tu nivel. Si eres principiante, te guía paso a paso con pistas en español. Si ya tienes base, sube la dificultad automáticamente.',
+      },
+      {
+        id: 'free',
+        question: '¿Es gratis?',
+        answer:
+          'Sí, puedes usar el plan Gratis sin límite de tiempo: 10 mensajes al día, un quiz diario, diccionario y conjugaciones ilimitados. Para práctica ilimitada, el plan Premium cuesta $29.900/mes.',
+      },
+      {
+        id: 'mobile',
+        question: '¿Funciona en el celular?',
+        answer:
+          'Sí. ROHU Learn English es una app web que funciona directo desde el navegador de tu celular o computador. No necesitas descargar nada.',
+      },
+      {
+        id: 'voice',
+        question: '¿Puedo practicar hablando?',
+        answer:
+          'Sí. El sistema tiene reconocimiento de voz: puedes responder los quizzes hablando en vez de escribiendo y ganas más puntos. También puedes escuchar la pronunciación correcta de cualquier frase.',
+      },
+      {
+        id: 'progress',
+        question: '¿Cómo funciona el sistema de niveles?',
+        answer:
+          'Hay 7 niveles, de Beginner a Master. Ganas XP por cada mensaje, quiz y palabra que busques. Tu nivel sube automáticamente al acumular suficientes puntos. También hay rachas diarias para motivarte.',
+      },
+      {
+        id: 'internet',
+        question: '¿Necesito internet para usarlo?',
+        answer:
+          'Sí, la tutora IA necesita conexión a internet para responder. El diccionario y las conjugaciones también requieren conexión.',
+      },
+      {
+        id: 'privacy',
+        question: '¿Mis conversaciones son privadas?',
+        answer:
+          'Sí. Tus conversaciones con Ms. Emma no se comparten con nadie. Los datos de progreso se guardan localmente en tu navegador. ROHU Solutions cumple con la Ley 1581 de Habeas Data.',
+      },
+    ],
+  },
+  ctaFinal: {
+    eyebrow: '¿Listo para practicar?',
+    sectionTitle: 'Tu primera conversación en inglés empieza hoy',
+    body:
+      'No importa tu nivel. Ms. Emma te espera para conversar, corregirte y ayudarte a mejorar. Crea tu cuenta gratis y empieza a hablar inglés ahora.',
+  },
+  metaTitle: 'ROHU Learn English — Aprende inglés con tutora IA conversacional',
+  metaDescription:
+    'Practica inglés conversando con Ms. Emma, una tutora de inteligencia artificial. Quizzes de vocabulario y listening, conjugaciones, pronunciación con voz y sistema de niveles. Para hispanohablantes. Gratis para empezar.',
+};
+
+/**
  * Placeholder apps (coming_soon) — these are visible in the home grid so the
  * visitor sees the catalog vision, but their pages are not generated until
  * status is flipped to 'live' and the content is filled in.
@@ -870,7 +1178,7 @@ const comingSoonApps: Application[] = [
   },
 ];
 
-export const applications: Application[] = [rohuContable, rohuConnect, ...comingSoonApps];
+export const applications: Application[] = [rohuContable, rohuConnect, rohuLearnEnglish, ...comingSoonApps];
 
 export function getApplicationBySlug(slug: string): Application | undefined {
   return applications.find((a) => a.slug === slug);
